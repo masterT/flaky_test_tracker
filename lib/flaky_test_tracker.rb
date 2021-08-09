@@ -2,6 +2,7 @@
 
 require_relative "flaky_test_tracker/version"
 require_relative "flaky_test_tracker/sources/github_source"
+require_relative "flaky_test_tracker/source_factory"
 
 module FlakyTestTracker
   class Error < StandardError; end
