@@ -7,6 +7,7 @@ require_relative "flaky_test_tracker/source_factory"
 require_relative "flaky_test_tracker/inputs/test_occurrence_input"
 require_relative "flaky_test_tracker/models/storage_id"
 require_relative "flaky_test_tracker/models/test_occurrence"
+require_relative "flaky_test_tracker/models/test"
 
 module FlakyTestTracker
   class Error < StandardError; end
