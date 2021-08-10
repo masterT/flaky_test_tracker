@@ -13,3 +13,8 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+# Load support files.
+Dir[
+  File.join(__dir__, "support", "**", "*.rb")
+].each { |f| require f }
