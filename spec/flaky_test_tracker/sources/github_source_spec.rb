@@ -7,7 +7,8 @@ RSpec.describe FlakyTestTracker::GitHubSource do
     {
       host: "mygithub.com",
       repository: "foo/bar",
-      commit: "ed4ea5437c628f5014d8ebaf00313eede64c6690"
+      commit: "0612bcf5b16a1ec368ef4ebb92d6be2f7040260b",
+      branch: "main"
     }
   end
 
@@ -18,7 +19,8 @@ RSpec.describe FlakyTestTracker::GitHubSource do
       expect(subject).to have_attributes(
         host: options[:host],
         repository: options[:repository],
-        commit: options[:commit]
+        commit: options[:commit],
+        branch: options[:branch]
       )
     end
 
@@ -26,7 +28,8 @@ RSpec.describe FlakyTestTracker::GitHubSource do
       let(:options) do
         {
           repository: "foo/bar",
-          commit: "ed4ea5437c628f5014d8ebaf00313eede64c6690"
+          commit: "0612bcf5b16a1ec368ef4ebb92d6be2f7040260b",
+          branch: "main"
         }
       end
 
@@ -36,7 +39,8 @@ RSpec.describe FlakyTestTracker::GitHubSource do
         expect(subject).to have_attributes(
           host: "github.com",
           repository: options[:repository],
-          commit: options[:commit]
+          commit: options[:commit],
+          branch: options[:branch]
         )
       end
     end
@@ -57,13 +61,13 @@ RSpec.describe FlakyTestTracker::GitHubSource do
       end
     end
 
-    describe "#source_location_uri" do
+    describe "#source_uri" do
       before do
         subject.configure(options)
       end
 
       it "returns the source URI" do
-        uri = subject.source_location_uri
+        uri = subject.source_uri
 
         expect(uri).to be_an URI
         expect(uri.to_s).to eq "https://#{options[:host]}/#{options[:repository]}/tree/#{options[:commit]}"

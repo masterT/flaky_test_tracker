@@ -15,7 +15,7 @@ module FlakyTestTracker
     end
 
     # @return [URI] on the source.
-    def source_location_uri
+    def source_uri
       raise NotImplementedError
     end
   end

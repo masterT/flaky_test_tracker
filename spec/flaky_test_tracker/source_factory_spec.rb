@@ -8,7 +8,8 @@ RSpec.describe FlakyTestTracker::SourceFactory do
         {
           host: "mygithub.com",
           repository: "foo/bar",
-          commit: "ed4ea5437c628f5014d8ebaf00313eede64c6690"
+          commit: "0612bcf5b16a1ec368ef4ebb92d6be2f7040260b",
+          branch: "main"
         }
       end
 
