@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :test, class: FlakyTestTracker::Models::Test do
+    skip_create
+
     test_id { "spec/foo_spec.rb[1:1]" }
     storage_id { build(:storage_id) }
     occurrences { [] }

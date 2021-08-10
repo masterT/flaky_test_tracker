@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :test_occurrence, class: FlakyTestTracker::Models::TestOccurrence do
+    skip_create
+
     test_id { "spec/foo_spec.rb[1:1]" }
     description { "it is expected to be validate" }
     exception { "Validation error" }
