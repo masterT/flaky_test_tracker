@@ -4,7 +4,7 @@ FactoryBot.define do
   factory :test_occurrence_input, class: FlakyTestTracker::Inputs::TestOccurrenceInput do
     skip_create
 
-    test_id { "spec/foo_spec.rb[1:1]" }
+    reference { "spec/foo_spec.rb[1:1]" }
     description { "it is expected to be validate" }
     exception { "Validation error" }
     file_path { "spec/foo_spec.rb" }

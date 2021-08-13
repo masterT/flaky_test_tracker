@@ -7,10 +7,13 @@ module FlakyTestTracker
     # Test model.
     class Test
       include ActiveModel::Model
+      include ActiveModel::Serializers::JSON
+      include ActiveModel::Serializers::HTMLComment
 
       ATTRIBUTES = %w[
-        storage_id
-        test_id
+        id
+        url
+        reference
         occurrences
       ].freeze
 

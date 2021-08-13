@@ -7,15 +7,16 @@ module FlakyTestTracker
     # TestOccurrence model.
     class TestOccurrence
       include ActiveModel::Model
+      include ActiveModel::Serializers::JSON
 
       ATTRIBUTES = %w[
-        test_id
+        reference
         description
         exception
         file_path
         line_number
         finished_at
-        source_location_uri
+        source_location_url
       ].freeze
 
       attr_accessor(*ATTRIBUTES)

@@ -9,7 +9,7 @@ module FlakyTestTracker
       include ActiveModel::Model
 
       ATTRIBUTES = %w[
-        test_id
+        reference
         description
         exception
         file_path
@@ -20,7 +20,7 @@ module FlakyTestTracker
 
       attr_accessor(*ATTRIBUTES)
 
-      validates :test_id, presence: true
+      validates :reference, presence: true
       validates :description, presence: true
       validates :exception, presence: true
       validates :file_path, presence: true

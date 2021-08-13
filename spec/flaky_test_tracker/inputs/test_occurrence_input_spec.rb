@@ -4,7 +4,7 @@ RSpec.describe FlakyTestTracker::Inputs::TestOccurrenceInput, type: :model do
   subject { build(:test_occurrence_input) }
 
   context "validations" do
-    it { should validate_presence_of(:test_id) }
+    it { should validate_presence_of(:reference) }
     it { should validate_presence_of(:description) }
     it { should validate_presence_of(:exception) }
     it { should validate_presence_of(:file_path) }
