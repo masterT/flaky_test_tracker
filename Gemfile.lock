@@ -3,7 +3,6 @@ PATH
   specs:
     flaky_test_tracker (0.1.0)
       activemodel (~> 6.1)
-      kramdown (~> 1.11)
       nokogiri (~> 1.11)
       octokit (~> 4.0)
 
@@ -46,7 +45,6 @@ GEM
     faraday-rack (1.0.0)
     i18n (1.8.10)
       concurrent-ruby (~> 1.0)
-    kramdown (1.17.0)
     minitest (5.14.4)
     multipart-post (2.1.1)
     nokogiri (1.12.2-x86_64-darwin)
