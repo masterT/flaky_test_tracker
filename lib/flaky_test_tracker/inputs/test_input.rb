@@ -3,11 +3,12 @@
 require "active_model"
 
 module FlakyTestTracker
-  module Models
-    # TestOccurrence model.
-    class TestOccurrence
+  module Inputs
+    # Test input.
+    class TestInput
       include ActiveModel::Model
       include ActiveModel::Serializers::JSON
+      include ActiveModel::Serializers::HTMLComment
 
       ATTRIBUTES = %w[
         reference
@@ -20,6 +21,14 @@ module FlakyTestTracker
       ].freeze
 
       attr_accessor(*ATTRIBUTES)
+
+      validates :reference, presence: true
+      validates :description, presence: true
+      validates :exception, presence: true
+      validates :file_path, presence: true
+      validates :line_number, presence: true
+      validates :finished_at, presence: true
+      validates :source_location_url, presence: true
 
       def attributes
         ATTRIBUTES.zip([]).to_h

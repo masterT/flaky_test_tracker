@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe FlakyTestTracker::Inputs::TestOccurrenceInput, type: :model do
+RSpec.describe FlakyTestTracker::Inputs::TestInput, type: :model do
   subject { build(:test_occurrence_input) }
 
   context "validations" do

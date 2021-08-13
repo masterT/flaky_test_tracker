@@ -14,7 +14,12 @@ module FlakyTestTracker
         id
         url
         reference
-        occurrences
+        description
+        exception
+        file_path
+        line_number
+        finished_at
+        source_location_url
       ].freeze
 
       attr_accessor(*ATTRIBUTES)
