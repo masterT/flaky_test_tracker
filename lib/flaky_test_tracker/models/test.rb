@@ -8,13 +8,17 @@ module FlakyTestTracker
     class Test
       include ActiveModel::Model
       include ActiveModel::Serializers::JSON
-      include ActiveModel::Serializers::HTMLComment
 
       ATTRIBUTES = %w[
         id
-        url
         reference
-        occurrences
+        description
+        exception
+        file_path
+        line_number
+        finished_at
+        source_location_url
+        number_occurrences
       ].freeze
 
       attr_accessor(*ATTRIBUTES)
