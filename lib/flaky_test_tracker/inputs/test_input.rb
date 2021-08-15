@@ -7,6 +7,7 @@ module FlakyTestTracker
     # Test occurrence input.
     class TestOccurrenceInput
       include ActiveModel::Model
+      include ActiveModel::Serializers::JSON
 
       ATTRIBUTES = %w[
         reference

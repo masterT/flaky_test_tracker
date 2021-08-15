@@ -11,6 +11,7 @@ module FlakyTestTracker
 
       ATTRIBUTES = %w[
         id
+        url
         reference
         description
         exception
