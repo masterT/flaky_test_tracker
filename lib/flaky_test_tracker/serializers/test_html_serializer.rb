@@ -2,28 +2,28 @@
 
 require "time"
 require "json"
-require_relative "../inputs/test_input"
+require_relative "../models/test"
 
 module FlakyTestTracker
   module Serializers
-    # Test input HTML serializer.
-    class TestInputHTMLSerializer
+    # Test HTML serializer.
+    class TestHTMLSerializer
       attr_reader :html_serializer
 
       def initialize(html_serializer: HTMLSerializer.new)
         @html_serializer = html_serializer
       end
 
-      # @param [FlakyTestTracker::Inputs::TestInput] test_input.
-      # @return [String] The HTML representing the test_input serialized.
-      def serialize(test_input)
+      # @param [FlakyTestTracker::Models::Test] test.
+      # @return [String] The HTML representing the test serialized.
+      def serialize(test)
         html_serializer.serialize(
-          to_json(test_input)
+          to_json(test)
         )
       end
 
-      # @param [String] html The HTML representing a _FlakyTestTracker::Inputs::TestInput_.
-      # @return [FlakyTestTracker::Inputs::TestInput]
+      # @param [String] html The HTML representing a FlakyTestTracker::Models::Test.
+      # @return [FlakyTestTracker::Models::Test]
       def deserialize(html)
         from_json(
           html_serializer.deserialize(html)
@@ -32,16 +32,16 @@ module FlakyTestTracker
 
       private
 
-      def to_json(test_input)
+      def to_json(test)
         JSON.generate(
-          test_input
+          test
             .serializable_hash(except: :finished_at)
-            .merge("finished_at" => time_to_json(test_input.finished_at))
+            .merge("finished_at" => time_to_json(test.finished_at))
         )
       end
 
       def from_json(json)
-        FlakyTestTracker::Inputs::TestInput.new(
+        FlakyTestTracker::Models::Test.new(
           JSON
             .parse(json)
             .tap do |attributes|
