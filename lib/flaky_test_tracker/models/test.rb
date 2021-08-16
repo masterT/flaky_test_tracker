@@ -27,6 +27,10 @@ module FlakyTestTracker
       def attributes
         ATTRIBUTES.zip([]).to_h
       end
+
+      def ==(other)
+        attributes == other.attributes
+      end
     end
   end
 end
