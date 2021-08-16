@@ -9,7 +9,14 @@ module FlakyTestTracker
       class GitHubIssueRepository
         attr_reader :client, :repository, :label, :title_rendering, :body_rendering, :test_serializer
 
-        def initialize(client:, repository:, label:, title_rendering:, body_rendering:, test_serializer:)
+        def initialize(
+          client:,
+          repository:,
+          label:,
+          title_rendering:,
+          body_rendering:,
+          test_serializer:
+        )
           @client = Octokit::Client.new({ auto_paginate: true }.merge(client))
           @repository = repository
           @label = label
@@ -24,6 +31,13 @@ module FlakyTestTracker
           client
             .list_issues(repository, { state: :open, labels: label })
             .map { |github_issue| to_model(github_issue) }
+        end
+
+        # @return [Test]
+        def find(id)
+          # https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#issue-instance_method
+          github_issue = client.issue(repository, id)
+          to_model(github_issue)
         end
 
         # @return [Test]

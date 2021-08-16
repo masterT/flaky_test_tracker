@@ -58,7 +58,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
       allow(test_serializer).to receive(:deserialize).and_return(test)
     end
 
-    it "lists issues" do
+    it "fetches the GitHub issues" do
       subject.all
 
       expect(client).to have_received(:list_issues).with(
@@ -75,6 +75,36 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
 
     it "returns Test list" do
       expect(subject.all).to contain_exactly(test)
+    end
+  end
+
+  describe "#find" do
+    let(:test) { build(:test) }
+    let(:id) { test.id }
+    let(:issue) { build(:github_issue, id: test.id, html_url: test.url) }
+
+    before do
+      allow(client).to receive(:issue).and_return(issue)
+      allow(test_serializer).to receive(:deserialize).and_return(test)
+    end
+
+    it "fetches the issue" do
+      subject.find(id)
+
+      expect(client).to have_received(:issue).with(
+        attributes[:repository],
+        id
+      )
+    end
+
+    it "deserializes Test from issue body" do
+      subject.find(id)
+
+      expect(test_serializer).to have_received(:deserialize).with(issue.body)
+    end
+
+    it "returns Test list" do
+      expect(subject.find(id)).to eq(test)
     end
   end
 
