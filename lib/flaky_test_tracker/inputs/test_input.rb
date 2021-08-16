@@ -5,7 +5,7 @@ require "active_model"
 module FlakyTestTracker
   module Inputs
     # Test occurrence input.
-    class TestOccurrenceInput
+    class TestInput
       include ActiveModel::Model
       include ActiveModel::Serializers::JSON
 
@@ -33,6 +33,10 @@ module FlakyTestTracker
 
       def attributes
         ATTRIBUTES.zip([]).to_h
+      end
+
+      def ==(other)
+        attributes == other.attributes
       end
     end
   end
