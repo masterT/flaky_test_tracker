@@ -8,6 +8,7 @@ require_relative "flaky_test_tracker/sources/github_source"
 require_relative "flaky_test_tracker/source_factory"
 require_relative "flaky_test_tracker/inputs/test_input"
 require_relative "flaky_test_tracker/models/test"
+require_relative "flaky_test_tracker/repositories/test/github_issue_repository"
 
 module FlakyTestTracker
   class Error < StandardError; end
