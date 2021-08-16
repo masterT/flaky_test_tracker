@@ -4,7 +4,6 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
   subject { described_class.new(**attributes) }
 
   let(:client) { instance_double(Octokit::Client) }
-  let(:client_agent) { Sawyer::Agent.new("https://api.github.com/") }
   let(:title_rendering) { spy("rendering", output: "title") }
   let(:body_rendering) { spy("rendering", output: "body") }
   let(:test_serializer) { spy("test_serializer") }
@@ -52,16 +51,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
 
   describe "#all" do
     let(:test) { build(:test) }
-    let(:issue) do
-      Sawyer::Resource.new(
-        client_agent,
-        {
-          id: test.id,
-          html_url: test.url,
-          body: "body"
-        }
-      )
-    end
+    let(:issue) { build(:github_issue, id: test.id, html_url: test.url) }
 
     before do
       allow(client).to receive(:list_issues).and_return([issue])
@@ -92,16 +82,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
     let(:test_html) { "<!-- html -->" }
     let(:test_input) { build(:test_input) }
     let(:test) { build(:test) }
-    let(:issue) do
-      Sawyer::Resource.new(
-        client_agent,
-        {
-          id: test.id,
-          html_url: test.url,
-          body: "body"
-        }
-      )
-    end
+    let(:issue) { build(:github_issue, id: test.id, html_url: test.url) }
 
     before do
       allow(client).to receive(:create_issue).and_return(issue)
@@ -166,16 +147,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
     let(:test) { build(:test) }
     let(:id) { test.id }
     let(:test_input) { build(:test_input) }
-    let(:issue) do
-      Sawyer::Resource.new(
-        client_agent,
-        {
-          id: test.id,
-          html_url: test.url,
-          body: "body"
-        }
-      )
-    end
+    let(:issue) { build(:github_issue, id: test.id, html_url: test.url) }
 
     before do
       allow(client).to receive(:update_issue).and_return(issue)
@@ -239,16 +211,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
   describe "#delete" do
     let(:test) { build(:test) }
     let(:id) { test.id }
-    let(:issue) do
-      Sawyer::Resource.new(
-        client_agent,
-        {
-          id: test.id,
-          html_url: test.url,
-          body: "body"
-        }
-      )
-    end
+    let(:issue) { build(:github_issue, id: test.id, html_url: test.url) }
 
     before do
       allow(client).to receive(:close_issue).and_return(issue)
