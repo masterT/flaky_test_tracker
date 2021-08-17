@@ -3,7 +3,6 @@
 require_relative "flaky_test_tracker/version"
 require_relative "flaky_test_tracker/serializers/html_serializer"
 require_relative "flaky_test_tracker/serializers/test_html_serializer"
-require_relative "flaky_test_tracker/sources/abstract_source"
 require_relative "flaky_test_tracker/sources/github_source"
 require_relative "flaky_test_tracker/source_factory"
 require_relative "flaky_test_tracker/inputs/test_input"

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe FlakyTestTracker::SourceFactory do
-  describe "::configure" do
+  describe "::build" do
     context "with github type" do
       let(:type) { :github }
       let(:options) do
@@ -14,7 +14,7 @@ RSpec.describe FlakyTestTracker::SourceFactory do
       end
 
       it "returns an instance of GitHubSource" do
-        expect(described_class.configure(type: type, options: options)).to be_a(FlakyTestTracker::GitHubSource)
+        expect(described_class.build(type: type, options: options)).to be_a(FlakyTestTracker::GitHubSource)
       end
     end
 
@@ -23,7 +23,7 @@ RSpec.describe FlakyTestTracker::SourceFactory do
       let(:options) { {} }
 
       it "raise an ArgumentError" do
-        expect { described_class.configure(type: type, options: options) }.to raise_error(ArgumentError, /type/)
+        expect { described_class.build(type: type, options: options) }.to raise_error(ArgumentError, /type/)
       end
     end
   end

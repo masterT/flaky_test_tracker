@@ -3,16 +3,10 @@
 module FlakyTestTracker
   # Class to initialize and configure source instance.
   class SourceFactory
-    def self.configure(type:, options:)
-      source = build(type)
-      source.configure(options)
-      source
-    end
-
-    def self.build(type)
+    def self.build(type:, options:)
       case type
       when :github
-        GitHubSource.new
+        GitHubSource.new(**options)
       else
         raise ArgumentError, "Unkown source for type #{type}"
       end
