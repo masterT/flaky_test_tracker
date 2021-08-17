@@ -1,53 +1,25 @@
 # frozen_string_literal: true
 
-RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
-  subject { described_class.new(**attributes) }
+require "octokit"
 
-  let(:client) { instance_double(Octokit::Client) }
-  let(:title_rendering) { spy("rendering", output: "title") }
-  let(:body_rendering) { spy("rendering", output: "body") }
-  let(:test_serializer) { spy("test_serializer") }
-  let(:attributes) do
-    {
-      client: {
-        access_token: "0612bcf5b16a1ec368ef4ebb92d6be2f7040260b"
-      },
-      repository: "foo/bar",
-      label: "flaky",
+RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
+  subject do
+    described_class.new(
+      client: client,
+      repository: repository,
+      labels: labels,
       title_rendering: title_rendering,
       body_rendering: body_rendering,
       test_serializer: test_serializer
-    }
+    )
   end
 
-  before do
-    allow(Octokit::Client).to receive(:new).and_return(client)
-  end
-
-  describe "::new" do
-    it "initializes GitHub client" do
-      described_class.new(**attributes)
-
-      expect(Octokit::Client).to have_received(:new).with(
-        { auto_paginate: true }.merge(
-          attributes[:client]
-        )
-      )
-    end
-
-    it "sets attributes" do
-      expect(
-        described_class.new(**attributes)
-      ).to have_attributes(
-        client: client,
-        repository: attributes[:repository],
-        label: attributes[:label],
-        title_rendering: title_rendering,
-        body_rendering: body_rendering,
-        test_serializer: test_serializer
-      )
-    end
-  end
+  let(:client) { instance_double(Octokit::Client) }
+  let(:repository) { "foo/bar" }
+  let(:labels) { "flaky" }
+  let(:title_rendering) { spy("rendering", output: "title") }
+  let(:body_rendering) { spy("rendering", output: "body") }
+  let(:test_serializer) { spy("test_serializer") }
 
   describe "#all" do
     let(:test) { build(:test) }
@@ -62,8 +34,8 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
       subject.all
 
       expect(client).to have_received(:list_issues).with(
-        attributes[:repository],
-        { state: :open, labels: attributes[:label] }
+        repository,
+        { state: :open, labels: labels }
       )
     end
 
@@ -92,7 +64,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
       subject.find(id)
 
       expect(client).to have_received(:issue).with(
-        attributes[:repository],
+        repository,
         id
       )
     end
@@ -154,10 +126,10 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
       ].join("\n")
 
       expect(client).to have_received(:create_issue).with(
-        attributes[:repository],
+        repository,
         expected_title,
         expected_body,
-        { labels: attributes[:label] }
+        { labels: labels }
       )
     end
 
@@ -219,11 +191,11 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
       ].join("\n")
 
       expect(client).to have_received(:update_issue).with(
-        attributes[:repository],
+        repository,
         id,
         expected_title,
         expected_body,
-        { labels: attributes[:label] }
+        { labels: labels }
       )
     end
 
@@ -252,7 +224,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
       subject.delete(id)
 
       expect(client).to have_received(:close_issue).with(
-        attributes[:repository],
+        repository,
         id
       )
     end

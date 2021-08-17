@@ -1,25 +1,23 @@
 # frozen_string_literal: true
 
-require "octokit"
-
 module FlakyTestTracker
   module Repositories
     module Test
       # GitHub issue test repository.
       class GitHubIssueRepository
-        attr_reader :client, :repository, :label, :title_rendering, :body_rendering, :test_serializer
+        attr_reader :client, :repository, :labels, :title_rendering, :body_rendering, :test_serializer
 
         def initialize(
           client:,
           repository:,
-          label:,
+          labels:,
           title_rendering:,
           body_rendering:,
           test_serializer:
         )
-          @client = Octokit::Client.new({ auto_paginate: true }.merge(client))
+          @client = client
           @repository = repository
-          @label = label
+          @labels = labels
           @title_rendering = title_rendering
           @body_rendering = body_rendering
           @test_serializer = test_serializer
@@ -29,7 +27,7 @@ module FlakyTestTracker
         def all
           # https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#list_issues-instance_method
           client
-            .list_issues(repository, { state: :open, labels: label })
+            .list_issues(repository, { state: :open, labels: labels })
             .map { |github_issue| to_model(github_issue) }
         end
 
@@ -48,7 +46,7 @@ module FlakyTestTracker
             repository,
             render_title(test: test),
             render_body(test: test),
-            { labels: label }
+            { labels: labels }
           )
           to_model(github_issue)
         end
@@ -62,7 +60,7 @@ module FlakyTestTracker
             id,
             render_title(test: test),
             render_body(test: test),
-            { labels: label }
+            { labels: labels }
           )
           to_model(github_issue)
         end
