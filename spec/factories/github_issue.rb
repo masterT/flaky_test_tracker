@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "octokit"
+
 FactoryBot.define do
   factory :github_issue, class: Sawyer::Resource do
     skip_create
