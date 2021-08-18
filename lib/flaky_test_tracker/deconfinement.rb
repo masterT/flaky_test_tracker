@@ -24,10 +24,6 @@ module FlakyTestTracker
       deconfined_tests
     end
 
-    def clear
-      @test_inputs_attributes = []
-    end
-
     private
 
     def deconfine_test(test)
