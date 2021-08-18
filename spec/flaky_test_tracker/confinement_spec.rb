@@ -75,7 +75,7 @@ RSpec.describe FlakyTestTracker::Confinement do
 
   describe "#confine" do
     context "when TestInput attributes added" do
-      let(:source_location_uri) { URI("https://github.com/foo/bar/blob/0612bcf5b16a1ec368ef4ebb92d6be2f7040260b/spec/foo_spec.rb") }
+      let(:file_source_location_uri) { URI("https://github.com/foo/bar/blob/0612bcf5b16a1ec368ef4ebb92d6be2f7040260b/spec/foo_spec.rb") }
       let(:test_input_attributes) do
         attributes_for(:test_input).except(
           :number_occurrences,
@@ -86,7 +86,7 @@ RSpec.describe FlakyTestTracker::Confinement do
       before do
         subject.add(**test_input_attributes)
 
-        allow(source).to receive(:source_location_uri).and_return(source_location_uri)
+        allow(source).to receive(:file_source_location_uri).and_return(file_source_location_uri)
       end
 
       context "when TestInput attributes invalid" do
@@ -112,7 +112,7 @@ RSpec.describe FlakyTestTracker::Confinement do
           build(
             :test,
             test.serializable_hash.merge(
-              source_location_url: source_location_uri.to_s,
+              source_location_url: file_source_location_uri.to_s,
               number_occurrences: test.number_occurrences + 1
             )
           )
@@ -126,7 +126,7 @@ RSpec.describe FlakyTestTracker::Confinement do
         it "generates source_location_url" do
           subject.confine
 
-          expect(source).to have_received(:source_location_uri).with(
+          expect(source).to have_received(:file_source_location_uri).with(
             file_path: test_input_attributes[:file_path],
             line_number: test_input_attributes[:line_number]
           )
@@ -140,7 +140,7 @@ RSpec.describe FlakyTestTracker::Confinement do
             FlakyTestTracker::Inputs::TestInput.new(
               test_input_attributes.merge(
                 number_occurrences: test.number_occurrences + 1,
-                source_location_url: source_location_uri.to_s
+                source_location_url: file_source_location_uri.to_s
               )
             )
           )
@@ -177,7 +177,7 @@ RSpec.describe FlakyTestTracker::Confinement do
           build(
             :test,
             test.serializable_hash.merge(
-              source_location_url: source_location_uri.to_s,
+              source_location_url: file_source_location_uri.to_s,
               number_occurrences: test.number_occurrences + 1
             )
           )
@@ -191,7 +191,7 @@ RSpec.describe FlakyTestTracker::Confinement do
         it "generates source_location_url" do
           subject.confine
 
-          expect(source).to have_received(:source_location_uri).with(
+          expect(source).to have_received(:file_source_location_uri).with(
             file_path: test_input_attributes[:file_path],
             line_number: test_input_attributes[:line_number]
           )
@@ -204,7 +204,7 @@ RSpec.describe FlakyTestTracker::Confinement do
             FlakyTestTracker::Inputs::TestInput.new(
               test_input_attributes.merge(
                 number_occurrences: 1,
-                source_location_url: source_location_uri.to_s
+                source_location_url: file_source_location_uri.to_s
               )
             )
           )

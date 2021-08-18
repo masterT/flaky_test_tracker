@@ -94,7 +94,7 @@ module FlakyTestTracker
     end
 
     def build_test_input_source_location_url(file_path:, line_number:)
-      source.source_location_uri(
+      source.file_source_location_uri(
         file_path: file_path,
         line_number: line_number
       ).to_s
