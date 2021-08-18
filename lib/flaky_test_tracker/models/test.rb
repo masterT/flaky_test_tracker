@@ -31,6 +31,10 @@ module FlakyTestTracker
       def ==(other)
         attributes == other.attributes
       end
+
+      def location
+        "#{file_path}:#{line_number}"
+      end
     end
   end
 end
