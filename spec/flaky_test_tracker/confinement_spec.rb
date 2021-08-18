@@ -13,7 +13,13 @@ RSpec.describe FlakyTestTracker::Confinement do
   let(:test_repository) { spy("test_repository") }
   let(:context) { spy("context") }
   let(:source) { spy("source") }
-  let(:reporter) { spy("reporter") }
+  let(:reporter) do
+    instance_double(
+      FlakyTestTracker::Reporter,
+      confined_test: nil,
+      confined_tests: nil
+    )
+  end
 
   describe "#tests" do
     let(:test) { build(:test) }
