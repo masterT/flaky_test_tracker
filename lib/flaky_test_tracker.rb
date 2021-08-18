@@ -9,6 +9,7 @@ require_relative "flaky_test_tracker/inputs/test_input"
 require_relative "flaky_test_tracker/models/test"
 require_relative "flaky_test_tracker/repositories/test/github_issue_repository"
 require_relative "flaky_test_tracker/rendering/erb_rendering"
+require_relative "flaky_test_tracker/reporter"
 require_relative "flaky_test_tracker/confinement"
 
 module FlakyTestTracker
