@@ -1,0 +1,10 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
+
+# You need to run `bundle exec rake build` in the project root directory first.
+gem "flaky_test_tracker", path: "../.."
+gem "octokit", "~> 4.0"
+gem "rspec", "~> 3.0"
