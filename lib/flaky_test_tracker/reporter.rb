@@ -20,5 +20,17 @@ module FlakyTestTracker
         reporter.confined_tests(tests: tests, source: source, context: context)
       end
     end
+
+    def deconfined_test(test:, confinement_duration:)
+      reporters.each do |reporter|
+        reporter.deconfined_test(test: test, confinement_duration: confinement_duration)
+      end
+    end
+
+    def deconfined_tests(tests:, confinement_duration:)
+      reporters.each do |reporter|
+        reporter.deconfined_tests(tests: tests, confinement_duration: confinement_duration)
+      end
+    end
   end
 end
