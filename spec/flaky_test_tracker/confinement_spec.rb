@@ -6,7 +6,7 @@ RSpec.describe FlakyTestTracker::Confinement do
       test_repository: test_repository,
       context: context,
       source: source,
-      reporters: reporters
+      reporter: reporter
     )
   end
 
@@ -14,7 +14,6 @@ RSpec.describe FlakyTestTracker::Confinement do
   let(:context) { spy("context") }
   let(:source) { spy("source") }
   let(:reporter) { spy("reporter") }
-  let(:reporters) { [reporter] }
 
   describe "#tests" do
     let(:test) { build(:test) }
@@ -141,6 +140,26 @@ RSpec.describe FlakyTestTracker::Confinement do
           )
         end
 
+        it "report confined_test" do
+          subject.confine
+
+          expect(reporter).to have_received(:confined_test).with(
+            test: test_updated,
+            source: source,
+            context: context
+          )
+        end
+
+        it "report confined_tests" do
+          subject.confine
+
+          expect(reporter).to have_received(:confined_tests).with(
+            tests: [test_updated],
+            source: source,
+            context: context
+          )
+        end
+
         it "returns updated Tests" do
           expect(subject.confine).to containing_exactly(test_updated)
         end
@@ -182,6 +201,26 @@ RSpec.describe FlakyTestTracker::Confinement do
                 source_location_url: source_location_uri.to_s
               )
             )
+          )
+        end
+
+        it "report confined_test" do
+          subject.confine
+
+          expect(reporter).to have_received(:confined_test).with(
+            test: test_created,
+            source: source,
+            context: context
+          )
+        end
+
+        it "report confined_tests" do
+          subject.confine
+
+          expect(reporter).to have_received(:confined_tests).with(
+            tests: [test_created],
+            source: source,
+            context: context
           )
         end
 

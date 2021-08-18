@@ -3,13 +3,13 @@
 module FlakyTestTracker
   # Test confinement.
   class Confinement
-    attr_reader :test_repository, :context, :source, :reporters, :test_inputs_attributes
+    attr_reader :test_repository, :context, :source, :reporter, :test_inputs_attributes
 
-    def initialize(test_repository:, context:, source:, reporters:)
+    def initialize(test_repository:, context:, source:, reporter:)
       @test_repository = test_repository
       @context = context
       @source = source
-      @reporters = reporters
+      @reporter = reporter
       @tests = nil
       @test_inputs_attributes = []
     end
@@ -33,9 +33,9 @@ module FlakyTestTracker
     end
 
     def confine
-      test_inputs.map do |test_input|
-        confine_test(test_input)
-      end
+      confined_tests = test_inputs.map { |test_input| confine_test(test_input) }
+      reporter.confined_tests(source: source, context: context, tests: confined_tests)
+      confined_tests
     end
 
     def tests
@@ -51,6 +51,12 @@ module FlakyTestTracker
 
     def confine_test(test_input)
       test_input.validate!
+      confined_test = persiste_test(test_input)
+      reporter.confined_test(source: source, context: context, test: confined_test)
+      confined_test
+    end
+
+    def persiste_test(test_input)
       test = find_test_by_reference(test_input.reference)
       if test
         test_repository.update(test.id, test_input)
