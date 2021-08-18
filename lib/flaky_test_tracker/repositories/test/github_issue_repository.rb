@@ -27,7 +27,7 @@ module FlakyTestTracker
         def all
           # https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#list_issues-instance_method
           client
-            .list_issues(repository, { state: :open, labels: labels })
+            .list_issues(repository, { state: :open, labels: labels.join(",") })
             .map { |github_issue| to_model(github_issue) }
         end
 
@@ -46,7 +46,7 @@ module FlakyTestTracker
             repository,
             render_title(test: test),
             render_body(test: test),
-            { labels: labels }
+            { labels: labels.join(",") }
           )
           to_model(github_issue)
         end
@@ -90,7 +90,7 @@ module FlakyTestTracker
 
         def to_model(github_issue)
           test_serializer.deserialize(github_issue.body).tap do |test|
-            test.id = github_issue.id
+            test.id = github_issue.number.to_s
             test.url = github_issue[:html_url]
           end
         end

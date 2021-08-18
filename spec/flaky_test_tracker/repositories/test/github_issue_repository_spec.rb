@@ -16,7 +16,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
 
   let(:client) { instance_double(Octokit::Client) }
   let(:repository) { "foo/bar" }
-  let(:labels) { "flaky" }
+  let(:labels) { ["flaky"] }
   let(:title_rendering) { spy("rendering", output: "title") }
   let(:body_rendering) { spy("rendering", output: "body") }
   let(:test_serializer) { spy("test_serializer") }
@@ -35,7 +35,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
 
       expect(client).to have_received(:list_issues).with(
         repository,
-        { state: :open, labels: labels }
+        { state: :open, labels: labels.join(',') }
       )
     end
 
@@ -129,7 +129,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
         repository,
         expected_title,
         expected_body,
-        { labels: labels }
+        { labels: labels.join(",") }
       )
     end
 
