@@ -3,50 +3,23 @@
 require "flaky_test_tracker"
 require "octokit"
 
-confinement = FlakyTestTracker::Confinement.new(
-  context: nil,
-  source: FlakyTestTracker::GitHubSource.new(
+confinement = FlakyTestTracker.confinement(
+  verbose: true,
+  source: {
+    type: :github,
     repository: "masterT/flaky-test-tracker",
     commit: "14d5052a1770724d205e4069cf44049cb3140efd",
     branch: "main"
-  ),
-  reporter: FlakyTestTracker::Reporter.new,
-  test_repository: FlakyTestTracker::Repositories::Test::GitHubIssueRepository.new(
-    client: Octokit::Client.new(
-      auto_paginate: true,
+  },
+  reporters: [],
+  test_repository: {
+    type: :github_issue,
+    client: {
       access_token: ENV["GITHUB_ACCESS_TOKEN"]
-    ),
+    },
     repository: "masterT/flaky-test-confinement-test",
-    labels: ["flaky test"],
-    title_rendering: FlakyTestTracker::Rendering::ERBRendering.new(
-      template: "Flaky test <%= test.reference %>"
-    ),
-    body_rendering: FlakyTestTracker::Rendering::ERBRendering.new(
-      template: [
-        "### Reference",
-        "",
-        "<%= test.reference %>",
-        "",
-        "### Description",
-        "",
-        "<i><%= test.description %></i>",
-        "",
-        "### Exception",
-        "",
-        "<pre><%= test.exception %></pre>",
-        "",
-        "### Failed at",
-        "",
-        "<%= test.finished_at %>",
-        "",
-        "### Location",
-        "",
-        "[<%= test.location %>](<%= test.source_location_url %>)",
-        ""
-      ].join("\n")
-    ),
-    test_serializer: FlakyTestTracker::Serializers::TestHTMLSerializer.new
-  )
+    labels: ["flaky test"]
+  }
 )
 
 RSpec.configure do |config|
