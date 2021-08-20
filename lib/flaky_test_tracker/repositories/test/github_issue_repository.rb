@@ -70,6 +70,7 @@ module FlakyTestTracker
           client
             .list_issues(repository, { state: :open, labels: labels.join(",") })
             .map { |github_issue| to_model(github_issue) }
+            .compact
         end
 
         # @return [Test]
@@ -134,6 +135,9 @@ module FlakyTestTracker
             test.id = github_issue.number.to_s
             test.url = github_issue[:html_url]
           end
+        rescue StandardError
+          # Handle malformed GitHub issue.
+          nil
         end
       end
     end

@@ -120,6 +120,16 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
       expect(serializer).to have_received(:deserialize).with(issue.body)
     end
 
+    context "when issue is impossible to deserialize" do
+      before do
+        allow(serializer).to receive(:deserialize).and_raise(StandardError)
+      end
+
+      it "returns empty" do
+        expect(subject.all).to be_empty
+      end
+    end
+
     it "returns Test list" do
       expect(subject.all).to contain_exactly(test)
     end
