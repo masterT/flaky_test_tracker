@@ -9,4 +9,4 @@ end
 # Load initializers.
 Dir[
   File.join(__dir__, "initializers", "**", "*.rb")
-].each { |f| require f }
+].sort.each { |f| require f }

@@ -17,4 +17,4 @@ end
 # Load support files.
 Dir[
   File.join(__dir__, "support", "**", "*.rb")
-].each { |f| require f }
+].sort.each { |f| require f }

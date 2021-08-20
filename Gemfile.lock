@@ -93,8 +93,8 @@ GEM
     sawyer (0.8.2)
       addressable (>= 2.3.5)
       faraday (> 0.8, < 2.0)
-    shoulda-matchers (5.0.0)
-      activesupport (>= 5.2.0)
+    shoulda-matchers (4.5.1)
+      activesupport (>= 4.2.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.0.0)
@@ -111,7 +111,7 @@ DEPENDENCIES
   rake (~> 13.0)
   rspec (~> 3.0)
   rubocop (~> 1.7)
-  shoulda-matchers (~> 5.0)
+  shoulda-matchers (~> 4.5)
 
 BUNDLED WITH
    2.2.24
