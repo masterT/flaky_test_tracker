@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "flaky_test_tracker"
-require "octokit"
 
 confinement = FlakyTestTracker.confinement(
   verbose: true,
