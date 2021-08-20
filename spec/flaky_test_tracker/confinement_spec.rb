@@ -75,7 +75,9 @@ RSpec.describe FlakyTestTracker::Confinement do
 
   describe "#confine" do
     context "when TestInput attributes added" do
-      let(:file_source_location_uri) { URI("https://github.com/foo/bar/blob/0612bcf5b16a1ec368ef4ebb92d6be2f7040260b/spec/foo_spec.rb") }
+      let(:file_source_location_uri) do
+        URI("https://github.com/foo/bar/blob/0612bcf5b16a1ec368ef4ebb92d6be2f7040260b/spec/foo_spec.rb")
+      end
       let(:test_input_attributes) do
         attributes_for(:test_input).except(
           :number_occurrences,

@@ -46,6 +46,7 @@ module FlakyTestTracker
 
         attr_reader :client, :repository, :labels, :title_rendering, :body_rendering, :serializer
 
+        # rubocop:disable Metrics/ParameterLists
         def initialize(
           client:,
           repository:,
@@ -61,6 +62,7 @@ module FlakyTestTracker
           @body_rendering = body_rendering
           @serializer = serializer
         end
+        # rubocop:enable Metrics/ParameterLists
 
         # @return [Array<Test>]
         def all

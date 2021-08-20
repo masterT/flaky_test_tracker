@@ -6,11 +6,13 @@ module FlakyTestTracker
     class STDOUTReporter < BaseReporter
       DAY_IN_SECOND = 86_400
 
+      # rubocop:disable Lint/UnusedMethodArgument
       def confined_tests(tests:, source:, context:)
         $stdout.puts(
           "\n[FlakyTestTracker] #{tests.length} test(s) confined"
         )
       end
+      # rubocop:enable Lint/UnusedMethodArgument
 
       def deconfined_tests(tests:, confinement_duration:)
         days = (confinement_duration / DAY_IN_SECOND).round(2)

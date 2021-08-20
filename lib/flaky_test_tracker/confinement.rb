@@ -14,6 +14,7 @@ module FlakyTestTracker
       @test_inputs_attributes = []
     end
 
+    # rubocop:disable Metrics/ParameterLists
     def add(
       reference:,
       description:,
@@ -31,6 +32,7 @@ module FlakyTestTracker
         finished_at: finished_at
       }
     end
+    # rubocop:enable Metrics/ParameterLists
 
     def confine
       confined_tests = test_inputs.map { |test_input| confine_test(test_input) }
