@@ -21,6 +21,81 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
   let(:body_rendering) { spy("rendering", output: "body") }
   let(:test_serializer) { spy("test_serializer") }
 
+  describe "::build" do
+    let(:options) do
+      {
+        client: { access_token: "0612bcf5b16a1ec368ef4ebb92d6be2f7040260b" },
+        repository: "foo/bar",
+        labels: ["flaky"],
+        title_template: "<%= test.reference %>",
+        body_template: "<%= test.reference %>"
+      }
+    end
+
+    it "initializes a new instance with attributes" do
+      expect(
+        described_class.build(**options)
+      ).to be_a(described_class).and(
+        have_attributes(
+          client: an_instance_of(Octokit::Client).and(
+            have_attributes(
+              options[:client].merge(auto_paginate: true)
+            )
+          ),
+          repository: options[:repository],
+          labels: options[:labels],
+          title_rendering: an_instance_of(FlakyTestTracker::Rendering::ERBRendering).and(
+            have_attributes(
+              template: options[:title_template]
+            )
+          ),
+          body_rendering: an_instance_of(FlakyTestTracker::Rendering::ERBRendering).and(
+            have_attributes(
+              template: options[:body_template]
+            )
+          ),
+          test_serializer: an_instance_of(FlakyTestTracker::Serializers::TestHTMLSerializer)
+        )
+      )
+    end
+
+    context "with only required options" do
+      let(:options) do
+        {
+          client: { access_token: "0612bcf5b16a1ec368ef4ebb92d6be2f7040260b" },
+          repository: "foo/bar"
+        }
+      end
+
+      it "initializes a new instance with default attributes" do
+        expect(
+          described_class.build(**options)
+        ).to be_a(described_class).and(
+          have_attributes(
+            client: an_instance_of(Octokit::Client).and(
+              have_attributes(
+                options[:client].merge(auto_paginate: true)
+              )
+            ),
+            repository: options[:repository],
+            labels: described_class::DEFAULT_LABELS,
+            title_rendering: an_instance_of(FlakyTestTracker::Rendering::ERBRendering).and(
+              have_attributes(
+                template: described_class::DEFAULT_TITLE_TEMPLATE
+              )
+            ),
+            body_rendering: an_instance_of(FlakyTestTracker::Rendering::ERBRendering).and(
+              have_attributes(
+                template: described_class::DEFAULT_BODY_TEMPLATE
+              )
+            ),
+            test_serializer: an_instance_of(FlakyTestTracker::Serializers::TestHTMLSerializer)
+          )
+        )
+      end
+    end
+  end
+
   describe "#all" do
     let(:test) { build(:test) }
     let(:issue) { build(:github_issue, id: test.id, html_url: test.url) }
@@ -35,7 +110,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
 
       expect(client).to have_received(:list_issues).with(
         repository,
-        { state: :open, labels: labels.join(',') }
+        { state: :open, labels: labels.join(",") }
       )
     end
 

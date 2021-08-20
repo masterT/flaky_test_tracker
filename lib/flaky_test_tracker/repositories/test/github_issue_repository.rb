@@ -5,6 +5,45 @@ module FlakyTestTracker
     module Test
       # GitHub issue test repository.
       class GitHubIssueRepository
+        DEFAULT_LABELS = ["flaky test"].freeze
+        DEFAULT_TITLE_TEMPLATE = "Flaky test <%= test.reference %>"
+        DEFAULT_BODY_TEMPLATE = <<~ERB
+          ### Reference
+          <%= test.reference %>
+
+          ### Description
+          <i><%= test.description %></i>
+
+          ### Exception
+          <pre><%= test.exception %></pre>
+
+          ### Failed at
+          <%= test.finished_at %>
+
+          ### Number occurrences
+          <%= test.number_occurrences %>
+
+          ### Location
+          [<%= test.location %>](<%= test.source_location_url %>)
+        ERB
+
+        def self.build(
+          client:,
+          repository:,
+          labels: DEFAULT_LABELS,
+          title_template: DEFAULT_TITLE_TEMPLATE,
+          body_template: DEFAULT_BODY_TEMPLATE
+        )
+          new(
+            client: Octokit::Client.new(client.merge(auto_paginate: true)),
+            repository: repository,
+            labels: labels,
+            title_rendering: FlakyTestTracker::Rendering::ERBRendering.new(template: title_template),
+            body_rendering: FlakyTestTracker::Rendering::ERBRendering.new(template: body_template),
+            test_serializer: FlakyTestTracker::Serializers::TestHTMLSerializer.new
+          )
+        end
+
         attr_reader :client, :repository, :labels, :title_rendering, :body_rendering, :test_serializer
 
         def initialize(
