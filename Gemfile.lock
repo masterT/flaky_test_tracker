@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     flaky_test_tracker (0.1.0)
-      activemodel (~> 6.1)
+      activemodel (>= 6.0)
       nokogiri (~> 1.11)
       octokit (~> 4.0)
 

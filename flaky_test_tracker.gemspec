@@ -28,9 +28,10 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency "activemodel", "~> 6.1"
+  spec.add_dependency "activemodel", ">= 6.0"
   spec.add_dependency "nokogiri", "~> 1.11"
   spec.add_dependency "octokit", "~> 4.0"
+  spec.platform = Gem::Platform::RUBY
 
   # For more information and examples about making a new gem, checkout our
   # guide at: https://bundler.io/guides/creating_gem.html
