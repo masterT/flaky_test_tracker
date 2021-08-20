@@ -6,9 +6,10 @@ module FlakyTestTracker
   module Rendering
     # ERB templat rendering.
     class ERBRendering
-      attr_reader :erb
+      attr_reader :erb, :template
 
       def initialize(template:)
+        @template = template
         @erb = ERB.new(template)
       end
 
