@@ -40,11 +40,11 @@ module FlakyTestTracker
             labels: labels,
             title_rendering: FlakyTestTracker::Rendering::ERBRendering.new(template: title_template),
             body_rendering: FlakyTestTracker::Rendering::ERBRendering.new(template: body_template),
-            test_serializer: FlakyTestTracker::Serializers::TestHTMLSerializer.new
+            serializer: FlakyTestTracker::Serializers::TestHTMLSerializer.new
           )
         end
 
-        attr_reader :client, :repository, :labels, :title_rendering, :body_rendering, :test_serializer
+        attr_reader :client, :repository, :labels, :title_rendering, :body_rendering, :serializer
 
         def initialize(
           client:,
@@ -52,14 +52,14 @@ module FlakyTestTracker
           labels:,
           title_rendering:,
           body_rendering:,
-          test_serializer:
+          serializer:
         )
           @client = client
           @repository = repository
           @labels = labels
           @title_rendering = title_rendering
           @body_rendering = body_rendering
-          @test_serializer = test_serializer
+          @serializer = serializer
         end
 
         # @return [Array<Test>]
@@ -122,13 +122,13 @@ module FlakyTestTracker
 
         def render_body(test:)
           [
-            test_serializer.serialize(test),
+            serializer.serialize(test),
             body_rendering.output(test: test)
           ].join("\n")
         end
 
         def to_model(github_issue)
-          test_serializer.deserialize(github_issue.body).tap do |test|
+          serializer.deserialize(github_issue.body).tap do |test|
             test.id = github_issue.number.to_s
             test.url = github_issue[:html_url]
           end

@@ -10,7 +10,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
       labels: labels,
       title_rendering: title_rendering,
       body_rendering: body_rendering,
-      test_serializer: test_serializer
+      serializer: serializer
     )
   end
 
@@ -19,7 +19,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
   let(:labels) { ["flaky"] }
   let(:title_rendering) { spy("rendering", output: "title") }
   let(:body_rendering) { spy("rendering", output: "body") }
-  let(:test_serializer) { spy("test_serializer") }
+  let(:serializer) { spy("serializer") }
 
   describe "::build" do
     let(:options) do
@@ -54,7 +54,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
               template: options[:body_template]
             )
           ),
-          test_serializer: an_instance_of(FlakyTestTracker::Serializers::TestHTMLSerializer)
+          serializer: an_instance_of(FlakyTestTracker::Serializers::TestHTMLSerializer)
         )
       )
     end
@@ -89,7 +89,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
                 template: described_class::DEFAULT_BODY_TEMPLATE
               )
             ),
-            test_serializer: an_instance_of(FlakyTestTracker::Serializers::TestHTMLSerializer)
+            serializer: an_instance_of(FlakyTestTracker::Serializers::TestHTMLSerializer)
           )
         )
       end
@@ -102,7 +102,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
 
     before do
       allow(client).to receive(:list_issues).and_return([issue])
-      allow(test_serializer).to receive(:deserialize).and_return(test)
+      allow(serializer).to receive(:deserialize).and_return(test)
     end
 
     it "fetches the GitHub issues" do
@@ -117,7 +117,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
     it "deserializes Test from issue body" do
       subject.all
 
-      expect(test_serializer).to have_received(:deserialize).with(issue.body)
+      expect(serializer).to have_received(:deserialize).with(issue.body)
     end
 
     it "returns Test list" do
@@ -132,7 +132,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
 
     before do
       allow(client).to receive(:issue).and_return(issue)
-      allow(test_serializer).to receive(:deserialize).and_return(test)
+      allow(serializer).to receive(:deserialize).and_return(test)
     end
 
     it "fetches the issue" do
@@ -147,7 +147,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
     it "deserializes Test from issue body" do
       subject.find(id)
 
-      expect(test_serializer).to have_received(:deserialize).with(issue.body)
+      expect(serializer).to have_received(:deserialize).with(issue.body)
     end
 
     it "returns Test list" do
@@ -163,8 +163,8 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
 
     before do
       allow(client).to receive(:create_issue).and_return(issue)
-      allow(test_serializer).to receive(:serialize).and_return(test_html)
-      allow(test_serializer).to receive(:deserialize).and_return(test)
+      allow(serializer).to receive(:serialize).and_return(test_html)
+      allow(serializer).to receive(:deserialize).and_return(test)
     end
 
     it "renders title" do
@@ -211,7 +211,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
     it "deserializes Test from issue body" do
       subject.create(test_input)
 
-      expect(test_serializer).to have_received(:deserialize).with(issue.body)
+      expect(serializer).to have_received(:deserialize).with(issue.body)
     end
 
     it "returns Test" do
@@ -228,8 +228,8 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
 
     before do
       allow(client).to receive(:update_issue).and_return(issue)
-      allow(test_serializer).to receive(:serialize).and_return(test_html)
-      allow(test_serializer).to receive(:deserialize).and_return(test)
+      allow(serializer).to receive(:serialize).and_return(test_html)
+      allow(serializer).to receive(:deserialize).and_return(test)
     end
 
     it "renders title" do
@@ -277,7 +277,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
     it "deserializes Test from issue body" do
       subject.update(id, test_input)
 
-      expect(test_serializer).to have_received(:deserialize).with(issue.body)
+      expect(serializer).to have_received(:deserialize).with(issue.body)
     end
 
     it "returns Test" do
@@ -292,7 +292,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
 
     before do
       allow(client).to receive(:close_issue).and_return(issue)
-      allow(test_serializer).to receive(:deserialize).and_return(test)
+      allow(serializer).to receive(:deserialize).and_return(test)
     end
 
     it "closes GitHub issue" do
@@ -307,7 +307,7 @@ RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
     it "deserializes Test from issue body" do
       subject.delete(id)
 
-      expect(test_serializer).to have_received(:deserialize).with(issue.body)
+      expect(serializer).to have_received(:deserialize).with(issue.body)
     end
 
     it "returns Test" do
