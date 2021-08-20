@@ -2,7 +2,7 @@
 
 require "uri"
 
-RSpec.describe FlakyTestTracker::GitHubSource do
+RSpec.describe FlakyTestTracker::Sources::GitHubSource do
   subject do
     described_class.new(
       host: host,
@@ -17,36 +17,46 @@ RSpec.describe FlakyTestTracker::GitHubSource do
   let(:commit) { "0612bcf5b16a1ec368ef4ebb92d6be2f7040260b" }
   let(:branch) { "main" }
 
-  describe "::new" do
-    it "sets attributes" do
-      expect(
-        described_class.new(
-          host: host,
-          repository: repository,
-          commit: commit,
-          branch: branch
-        )
-      ).to have_attributes(
+  describe "::build" do
+    let(:options) do
+      {
         host: host,
         repository: repository,
         commit: commit,
         branch: branch
+      }
+    end
+
+    it "initializes a new instance with attributes" do
+      expect(
+        described_class.build(**options)
+      ).to be_a(described_class).and(
+        have_attributes(
+          host: options[:host],
+          repository: options[:repository],
+          commit: options[:commit],
+          branch: options[:branch]
+        )
       )
     end
 
     context "with only required attributes" do
-      it "sets attributes using default values" do
-        expect(
-          described_class.new(
-            repository: repository,
-            commit: commit,
-            branch: branch
-          )
-        ).to have_attributes(
-          host: "github.com",
+      let(:options) do
+        {
           repository: repository,
           commit: commit,
           branch: branch
+        }
+      end
+
+      it "sets attributes using default values" do
+        expect(
+          described_class.build(**options)
+        ).to have_attributes(
+          host: described_class::DEFAULT_HOST,
+          repository: options[:repository],
+          commit: options[:commit],
+          branch: options[:branch]
         )
       end
     end
