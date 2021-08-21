@@ -6,14 +6,14 @@ module FlakyTestTracker
     DAY_IN_SECOND = 86_400
     DEFAULT_CONFINEMENT_DURATION = 40 * DAY_IN_SECOND
 
-    attr_reader :test_repository, :reporter, :confinement_duration
+    attr_reader :storage, :reporter, :confinement_duration
 
     def initialize(
-      test_repository:,
+      storage:,
       reporter:,
       confinement_duration: DEFAULT_CONFINEMENT_DURATION
     )
-      @test_repository = test_repository
+      @storage = storage
       @reporter = reporter
       @confinement_duration = confinement_duration
     end
@@ -27,7 +27,7 @@ module FlakyTestTracker
     private
 
     def deconfine_test(test)
-      deconfined_test = test_repository.delete(test.id)
+      deconfined_test = storage.delete(test.id)
       reporter.deconfined_test(test: deconfined_test, confinement_duration: confinement_duration)
       deconfined_test
     end
@@ -39,7 +39,7 @@ module FlakyTestTracker
     end
 
     def tests
-      @tests ||= @test_repository.all
+      @tests ||= @storage.all
     end
   end
 end

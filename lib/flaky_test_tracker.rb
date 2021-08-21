@@ -6,7 +6,7 @@ require_relative "flaky_test_tracker/serializers/test_html_serializer"
 require_relative "flaky_test_tracker/sources/github_source"
 require_relative "flaky_test_tracker/inputs/test_input"
 require_relative "flaky_test_tracker/models/test"
-require_relative "flaky_test_tracker/repositories/test/github_issue_repository"
+require_relative "flaky_test_tracker/storage/github_issue_storage"
 require_relative "flaky_test_tracker/rendering/erb_rendering"
 require_relative "flaky_test_tracker/reporter"
 require_relative "flaky_test_tracker/reporters/base_reporter"
@@ -20,7 +20,7 @@ module FlakyTestTracker
 
   def self.confinement(**arguments)
     FlakyTestTracker::Confinement.new(
-      test_repository: test_repository(**arguments[:test_repository]),
+      storage: storage(**arguments[:storage]),
       context: arguments[:context],
       source: source(**arguments[:source]),
       reporter: reporter(
@@ -32,7 +32,7 @@ module FlakyTestTracker
 
   def self.deconfinement(**arguments)
     FlakyTestTracker::Deconfinement.new(
-      test_repository: test_repository(**arguments[:test_repository]),
+      storage: storage(**arguments[:storage]),
       reporter: reporter(
         reporters: arguments[:reporters],
         verbose: arguments[:verbose]
@@ -40,10 +40,10 @@ module FlakyTestTracker
     )
   end
 
-  def self.test_repository(type:, options:)
+  def self.storage(type:, options:)
     case type
     when :github_issue
-      FlakyTestTracker::Repositories::Test::GitHubIssueRepository.build(**options)
+      FlakyTestTracker::Storage::GitHubIssueStorage.build(**options)
     else
       raise ArgumentError, "Unkown test repository type #{type.inspect}"
     end

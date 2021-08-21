@@ -13,7 +13,7 @@ confinement = FlakyTestTracker.confinement(
     }
   },
   reporters: [],
-  test_repository: {
+  storage: {
     type: :github_issue,
     options: {
       client: {

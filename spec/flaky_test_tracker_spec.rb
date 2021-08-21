@@ -8,7 +8,7 @@ RSpec.describe FlakyTestTracker do
   describe "::confinement" do
     let(:arguments) do
       {
-        test_repository: {
+        storage: {
           type: :github_issue,
           options: {
             client: { access_token: "0612bcf5b16a1ec368ef4ebb92d6be2f7040260b" },
@@ -41,7 +41,7 @@ RSpec.describe FlakyTestTracker do
   describe "::deconfinement" do
     let(:arguments) do
       {
-        test_repository: {
+        storage: {
           type: :github_issue,
           options: {
             client: { access_token: "0612bcf5b16a1ec368ef4ebb92d6be2f7040260b" },
@@ -62,7 +62,7 @@ RSpec.describe FlakyTestTracker do
     end
   end
 
-  describe "::test_repository" do
+  describe "::storage" do
     let(:type) { nil }
     let(:options) { {} }
     let(:arguments) do
@@ -84,9 +84,9 @@ RSpec.describe FlakyTestTracker do
         }
       end
 
-      it "returns an instance of FlakyTestTracker::Repositories::Test::GitHubIssueRepository" do
-        expect(described_class.test_repository(**arguments)).to be_a(
-          FlakyTestTracker::Repositories::Test::GitHubIssueRepository
+      it "returns an instance of FlakyTestTracker::Storage::GitHubIssueStorage" do
+        expect(described_class.storage(**arguments)).to be_a(
+          FlakyTestTracker::Storage::GitHubIssueStorage
         )
       end
     end
@@ -95,7 +95,7 @@ RSpec.describe FlakyTestTracker do
       let(:type) { :unkown_type }
 
       it "raise an ArgumentError" do
-        expect { described_class.test_repository(**arguments) }.to raise_error(ArgumentError, /unkown .* type/i)
+        expect { described_class.storage(**arguments) }.to raise_error(ArgumentError, /unkown .* type/i)
       end
     end
   end

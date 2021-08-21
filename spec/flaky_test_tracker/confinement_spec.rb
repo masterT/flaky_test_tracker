@@ -3,14 +3,14 @@
 RSpec.describe FlakyTestTracker::Confinement do
   subject do
     described_class.new(
-      test_repository: test_repository,
+      storage: storage,
       context: context,
       source: source,
       reporter: reporter
     )
   end
 
-  let(:test_repository) { spy("test_repository") }
+  let(:storage) { spy("storage") }
   let(:context) { spy("context") }
   let(:source) { spy("source") }
   let(:reporter) do
@@ -25,10 +25,10 @@ RSpec.describe FlakyTestTracker::Confinement do
     let(:test) { build(:test) }
 
     before do
-      allow(test_repository).to receive(:all).and_return([test])
+      allow(storage).to receive(:all).and_return([test])
     end
 
-    it "returns tests from test_repository" do
+    it "returns tests from storage" do
       expect(subject.tests).to eq [test]
     end
   end
@@ -121,8 +121,8 @@ RSpec.describe FlakyTestTracker::Confinement do
         end
 
         before do
-          allow(test_repository).to receive(:all).and_return([test])
-          allow(test_repository).to receive(:update).and_return(test_updated)
+          allow(storage).to receive(:all).and_return([test])
+          allow(storage).to receive(:update).and_return(test_updated)
         end
 
         it "generates source_location_url" do
@@ -137,7 +137,7 @@ RSpec.describe FlakyTestTracker::Confinement do
         it "updates Test with number_occurrences incremented by 1" do
           subject.confine
 
-          expect(test_repository).to have_received(:update).with(
+          expect(storage).to have_received(:update).with(
             test.id,
             FlakyTestTracker::Inputs::TestInput.new(
               test_input_attributes.merge(
@@ -186,8 +186,8 @@ RSpec.describe FlakyTestTracker::Confinement do
         end
 
         before do
-          allow(test_repository).to receive(:all).and_return([test])
-          allow(test_repository).to receive(:create).and_return(test_created)
+          allow(storage).to receive(:all).and_return([test])
+          allow(storage).to receive(:create).and_return(test_created)
         end
 
         it "generates source_location_url" do
@@ -202,7 +202,7 @@ RSpec.describe FlakyTestTracker::Confinement do
         it "updates Test with number_occurrences equals to 1" do
           subject.confine
 
-          expect(test_repository).to have_received(:create).with(
+          expect(storage).to have_received(:create).with(
             FlakyTestTracker::Inputs::TestInput.new(
               test_input_attributes.merge(
                 number_occurrences: 1,

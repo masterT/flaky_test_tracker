@@ -2,7 +2,7 @@
 
 require "octokit"
 
-RSpec.describe FlakyTestTracker::Repositories::Test::GitHubIssueRepository do
+RSpec.describe FlakyTestTracker::Storage::GitHubIssueStorage do
   subject do
     described_class.new(
       client: client,

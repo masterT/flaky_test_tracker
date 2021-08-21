@@ -3,10 +3,10 @@
 module FlakyTestTracker
   # Test confinement.
   class Confinement
-    attr_reader :test_repository, :context, :source, :reporter, :test_inputs_attributes
+    attr_reader :storage, :context, :source, :reporter, :test_inputs_attributes
 
-    def initialize(test_repository:, context:, source:, reporter:)
-      @test_repository = test_repository
+    def initialize(storage:, context:, source:, reporter:)
+      @storage = storage
       @context = context
       @source = source
       @reporter = reporter
@@ -41,7 +41,7 @@ module FlakyTestTracker
     end
 
     def tests
-      @tests ||= @test_repository.all
+      @tests ||= @storage.all
     end
 
     def clear
@@ -61,9 +61,9 @@ module FlakyTestTracker
     def persiste_test(test_input)
       test = find_test_by_reference(test_input.reference)
       if test
-        test_repository.update(test.id, test_input)
+        storage.update(test.id, test_input)
       else
-        test_repository.create(test_input)
+        storage.create(test_input)
       end
     end
 
