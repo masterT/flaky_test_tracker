@@ -139,7 +139,7 @@ RSpec.describe FlakyTestTracker::Confinement do
 
           expect(storage).to have_received(:update).with(
             test.id,
-            FlakyTestTracker::Inputs::TestInput.new(
+            FlakyTestTracker::TestInput.new(
               test_input_attributes.merge(
                 number_occurrences: test.number_occurrences + 1,
                 source_location_url: file_source_location_uri.to_s
@@ -203,7 +203,7 @@ RSpec.describe FlakyTestTracker::Confinement do
           subject.confine
 
           expect(storage).to have_received(:create).with(
-            FlakyTestTracker::Inputs::TestInput.new(
+            FlakyTestTracker::TestInput.new(
               test_input_attributes.merge(
                 number_occurrences: 1,
                 source_location_url: file_source_location_uri.to_s

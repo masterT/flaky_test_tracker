@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :test_input, class: FlakyTestTracker::Inputs::TestInput do
+  factory :test_input, class: FlakyTestTracker::TestInput do
     skip_create
 
     reference { "spec/foo_spec.rb[1:1]" }

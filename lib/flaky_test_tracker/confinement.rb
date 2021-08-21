@@ -75,7 +75,7 @@ module FlakyTestTracker
     end
 
     def build_test_input(reference:, file_path:, line_number:, **attributes)
-      FlakyTestTracker::Inputs::TestInput.new(
+      FlakyTestTracker::TestInput.new(
         attributes.merge(
           reference: reference,
           file_path: file_path,
