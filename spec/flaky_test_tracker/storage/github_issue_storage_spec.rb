@@ -44,12 +44,12 @@ RSpec.describe FlakyTestTracker::Storage::GitHubIssueStorage do
           ),
           repository: options[:repository],
           labels: options[:labels],
-          title_rendering: an_instance_of(FlakyTestTracker::Rendering::ERBRendering).and(
+          title_rendering: an_instance_of(FlakyTestTracker::Rendering).and(
             have_attributes(
               template: options[:title_template]
             )
           ),
-          body_rendering: an_instance_of(FlakyTestTracker::Rendering::ERBRendering).and(
+          body_rendering: an_instance_of(FlakyTestTracker::Rendering).and(
             have_attributes(
               template: options[:body_template]
             )
@@ -79,12 +79,12 @@ RSpec.describe FlakyTestTracker::Storage::GitHubIssueStorage do
             ),
             repository: options[:repository],
             labels: described_class::DEFAULT_LABELS,
-            title_rendering: an_instance_of(FlakyTestTracker::Rendering::ERBRendering).and(
+            title_rendering: an_instance_of(FlakyTestTracker::Rendering).and(
               have_attributes(
                 template: described_class::DEFAULT_TITLE_TEMPLATE
               )
             ),
-            body_rendering: an_instance_of(FlakyTestTracker::Rendering::ERBRendering).and(
+            body_rendering: an_instance_of(FlakyTestTracker::Rendering).and(
               have_attributes(
                 template: described_class::DEFAULT_BODY_TEMPLATE
               )

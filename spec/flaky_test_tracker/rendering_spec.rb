@@ -2,7 +2,7 @@
 
 require "erb"
 
-RSpec.describe FlakyTestTracker::Rendering::ERBRendering do
+RSpec.describe FlakyTestTracker::Rendering do
   subject { described_class.new(template: template) }
 
   let(:template) { "<%= foo %>" }

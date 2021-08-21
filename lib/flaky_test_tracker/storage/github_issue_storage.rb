@@ -39,8 +39,8 @@ module FlakyTestTracker
           client: Octokit::Client.new(client.merge(auto_paginate: true)),
           repository: repository,
           labels: labels,
-          title_rendering: FlakyTestTracker::Rendering::ERBRendering.new(template: title_template),
-          body_rendering: FlakyTestTracker::Rendering::ERBRendering.new(template: body_template),
+          title_rendering: FlakyTestTracker::Rendering.new(template: title_template),
+          body_rendering: FlakyTestTracker::Rendering.new(template: body_template),
           serializer: FlakyTestTracker::Serializers::TestHTMLSerializer.new
         )
       end
