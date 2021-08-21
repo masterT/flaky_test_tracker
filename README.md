@@ -1,6 +1,6 @@
 # FlakyTestTracker
 
-[![Build](https://github.com/masterT/flaky_test_tracker/actions/workflows/main.yml/badge.svg)](https://github.com/masterT/flaky_test_tracker/actions/workflows/main.yml)
+[![Build](https://github.com/masterT/flaky_test_tracker/actions/workflows/build.yml/badge.svg)](https://github.com/masterT/flaky_test_tracker/actions/workflows/build.yml)
 
 Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/flaky_test_tracker`. To experiment with that code, run `bin/console` for an interactive prompt.
 
