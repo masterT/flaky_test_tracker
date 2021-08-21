@@ -2,7 +2,7 @@
 
 require "time"
 require "json"
-require_relative "../models/test"
+require_relative "../test"
 
 module FlakyTestTracker
   module Serializers
@@ -14,7 +14,7 @@ module FlakyTestTracker
         @html_serializer = html_serializer
       end
 
-      # @param [FlakyTestTracker::Models::Test] test.
+      # @param [FlakyTestTracker::Test] test.
       # @return [String] The HTML representing the test serialized.
       def serialize(test)
         html_serializer.serialize(
@@ -22,8 +22,8 @@ module FlakyTestTracker
         )
       end
 
-      # @param [String] html The HTML representing a FlakyTestTracker::Models::Test.
-      # @return [FlakyTestTracker::Models::Test]
+      # @param [String] html The HTML representing a FlakyTestTracker::Test.
+      # @return [FlakyTestTracker::Test]
       def deserialize(html)
         from_json(
           html_serializer.deserialize(html)
@@ -41,7 +41,7 @@ module FlakyTestTracker
       end
 
       def from_json(json)
-        FlakyTestTracker::Models::Test.new(
+        FlakyTestTracker::Test.new(
           JSON
             .parse(json)
             .tap do |attributes|

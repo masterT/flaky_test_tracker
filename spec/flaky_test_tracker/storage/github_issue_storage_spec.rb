@@ -181,7 +181,7 @@ RSpec.describe FlakyTestTracker::Storage::GitHubIssueStorage do
       subject.create(test_input)
 
       expect(title_rendering).to have_received(:output).with(
-        test: an_instance_of(FlakyTestTracker::Models::Test).and(
+        test: an_instance_of(FlakyTestTracker::Test).and(
           have_attributes(
             test_input.serializable_hash
           )
@@ -193,7 +193,7 @@ RSpec.describe FlakyTestTracker::Storage::GitHubIssueStorage do
       subject.create(test_input)
 
       expect(body_rendering).to have_received(:output).with(
-        test: an_instance_of(FlakyTestTracker::Models::Test).and(
+        test: an_instance_of(FlakyTestTracker::Test).and(
           have_attributes(
             test_input.serializable_hash
           )
@@ -246,7 +246,7 @@ RSpec.describe FlakyTestTracker::Storage::GitHubIssueStorage do
       subject.update(id, test_input)
 
       expect(title_rendering).to have_received(:output).with(
-        test: an_instance_of(FlakyTestTracker::Models::Test).and(
+        test: an_instance_of(FlakyTestTracker::Test).and(
           have_attributes(
             test_input.serializable_hash
           )
@@ -258,7 +258,7 @@ RSpec.describe FlakyTestTracker::Storage::GitHubIssueStorage do
       subject.update(id, test_input)
 
       expect(body_rendering).to have_received(:output).with(
-        test: an_instance_of(FlakyTestTracker::Models::Test).and(
+        test: an_instance_of(FlakyTestTracker::Test).and(
           have_attributes(
             test_input.serializable_hash
           )

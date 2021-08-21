@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :test, class: FlakyTestTracker::Models::Test do
+  factory :test, class: FlakyTestTracker::Test do
     skip_create
 
     id { 1 }

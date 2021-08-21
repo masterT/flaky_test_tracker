@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe FlakyTestTracker::Models::Test, type: :model do
+RSpec.describe FlakyTestTracker::Test, type: :model do
   subject { build(:test) }
 
   describe "#==" do

@@ -83,7 +83,7 @@ module FlakyTestTracker
 
       # @return [Test]
       def create(test_input)
-        test = FlakyTestTracker::Models::Test.new(test_input.serializable_hash)
+        test = FlakyTestTracker::Test.new(test_input.serializable_hash)
         # https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#create_issue-instance_method
         github_issue = client.create_issue(
           repository,
@@ -96,7 +96,7 @@ module FlakyTestTracker
 
       # @return [Test]
       def update(id, test_input)
-        test = FlakyTestTracker::Models::Test.new(test_input.serializable_hash)
+        test = FlakyTestTracker::Test.new(test_input.serializable_hash)
         # https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#update_issue-instance_method
         github_issue = client.update_issue(
           repository,
