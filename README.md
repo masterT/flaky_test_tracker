@@ -1,10 +1,13 @@
 # FlakyTestTracker
 
+> **:warning: Work in progress**
+
 [![Build](https://github.com/masterT/flaky_test_tracker/actions/workflows/build.yml/badge.svg)](https://github.com/masterT/flaky_test_tracker/actions/workflows/build.yml)
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/flaky_test_tracker`. To experiment with that code, run `bin/console` for an interactive prompt.
+Track flaky tests (i.e. those which fail non-deterministically) to help you fix them.
 
-TODO: Delete this and the text above, and describe your gem
+Storage:
+- GitHub Issue
 
 ## Installation
 
@@ -28,7 +31,126 @@ $ gem install flaky_test_tracker
 
 ## Usage
 
-TODO: Write usage instructions here
+### Storage
+
+...
+
+### Track flaky tests
+
+You should track flaky tests on a stable code base.
+
+#### RSpec
+
+Example using [RSpec](https://rubygems.org/gems/rspec).
+
+```ruby
+# frozen_string_literal: true
+
+require "flaky_test_tracker"
+
+stable_branches = ["develop", "main"]
+if ENV["CI"] == "true" && stable_branches.include?(ENV["CI_BRANCH"])
+  tracker = FlakyTestTracker.tracker(
+    verbose: true,
+    source: {
+      type: :github,
+      options: {
+        repository: "github-username/repository-name",
+        commit: ENV["CI_COMMIT"],
+        branch: ENV["CI_BRANCH"]
+      }
+    },
+    reporters: [],
+    storage: {
+      type: :github_issue,
+      options: {
+        client: {
+          access_token: ENV["GITHUB_ACCESS_TOKEN"]
+        },
+        repository: "github-username/repository-name",
+        labels: ["flaky test"]
+      }
+    }
+  )
+
+  RSpec.configure do |config|
+    config.before(:suite) do
+      tracker.clear
+    end
+
+    config.after do |example|
+      if example.exception
+        tracker.add(
+          reference: example.id,
+          description: example.full_description,
+          exception: example.exception.to_s.gsub(/\x1b\[[0-9;]*[a-zA-Z]/, ""), # Remove ANSI formatting.
+          file_path: example.metadata[:file_path],
+          line_number: example.metadata[:line_number]
+        )
+      end
+    end
+
+    config.after(:suite) do
+      tracker.track
+    end
+  end
+end
+```
+
+### Resolve flaky tests
+
+Once you fixed the flaky test, you can manually delete them from the storage or you can use the `FalkyTestTracker::Resolver` to do it automatically, e.g: using a _Rake_ taks that run periodically.
+
+```ruby
+# frozen_string_literal: true
+
+require "flaky_test_tracker"
+
+resolver = FlakyTestTracker.resolver(
+  verbose: true,
+  reporters: [],
+  storage: {
+    type: :github_issue,
+    options: {
+      client: {
+        access_token: ENV["GITHUB_ACCESS_TOKEN"]
+      },
+      repository: "github-username/repository-name",
+      labels: ["flaky test"]
+    }
+  }
+)
+```
+
+By default it will delete flaky tests that did not fail in the last 40 days.
+
+```ruby
+resolver.resolve
+```
+
+You can change the duration, with the option `duration_period_without_failure`.
+
+```ruby
+DAY_IN_SECOND = 86_400
+
+resolver = FlakyTestTracker.resolver(
+  duration_period_without_failure: 10 * DAY_IN_SECOND,
+  # ...
+)
+
+resolver.resolve
+```
+
+You can also select the flaky test with your how logic by passing a block which returns if the test should be resolved.
+
+```ruby
+resolver.resolve do |test|
+  # ...
+end
+```
+
+
+
 
 ## Development
 

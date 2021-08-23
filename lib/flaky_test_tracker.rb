@@ -29,8 +29,13 @@ module FlakyTestTracker
     )
   end
 
+  # rubocop:disable Metrics/MethodLength
   def self.resolver(**arguments)
     FlakyTestTracker::Resolver.new(
+      duration_period_without_failure: arguments.fetch(
+        :duration_period_without_failure,
+        FlakyTestTracker::Resolver::DEFAULT_DURATION_PERIOD_WITHOUT_FAILURE
+      ),
       storage: storage(**arguments[:storage]),
       reporter: reporter(
         reporters: arguments[:reporters],
@@ -38,6 +43,7 @@ module FlakyTestTracker
       )
     )
   end
+  # rubocop:enable Metrics/MethodLength
 
   def self.storage(type:, options:)
     case type
