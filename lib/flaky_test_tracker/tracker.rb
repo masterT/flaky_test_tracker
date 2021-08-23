@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module FlakyTestTracker
-  # Test confinement.
-  class Confinement
+  # Test tracker.
+  class Tracker
     attr_reader :storage, :context, :source, :reporter, :test_inputs_attributes
 
     def initialize(storage:, context:, source:, reporter:)
@@ -34,10 +34,10 @@ module FlakyTestTracker
     end
     # rubocop:enable Metrics/ParameterLists
 
-    def confine
-      confined_tests = test_inputs.map { |test_input| confine_test(test_input) }
-      reporter.confined_tests(source: source, context: context, tests: confined_tests)
-      confined_tests
+    def track
+      tracked_tests = test_inputs.map { |test_input| track_test(test_input) }
+      reporter.tracked_tests(source: source, context: context, tests: tracked_tests)
+      tracked_tests
     end
 
     def tests
@@ -51,11 +51,11 @@ module FlakyTestTracker
 
     private
 
-    def confine_test(test_input)
+    def track_test(test_input)
       test_input.validate!
-      confined_test = persiste_test(test_input)
-      reporter.confined_test(source: source, context: context, test: confined_test)
-      confined_test
+      tracked_test = persiste_test(test_input)
+      reporter.tracked_test(source: source, context: context, test: tracked_test)
+      tracked_test
     end
 
     def persiste_test(test_input)

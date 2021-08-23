@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe FlakyTestTracker::Confinement do
+RSpec.describe FlakyTestTracker::Tracker do
   subject do
     described_class.new(
       storage: storage,
@@ -16,8 +16,8 @@ RSpec.describe FlakyTestTracker::Confinement do
   let(:reporter) do
     instance_double(
       FlakyTestTracker::Reporter,
-      confined_test: nil,
-      confined_tests: nil
+      tracked_test: nil,
+      tracked_tests: nil
     )
   end
 
@@ -104,7 +104,7 @@ RSpec.describe FlakyTestTracker::Confinement do
         end
 
         it "raises an ActiveModel::ValidationError" do
-          expect { subject.confine }.to raise_error(ActiveModel::ValidationError)
+          expect { subject.track }.to raise_error(ActiveModel::ValidationError)
         end
       end
 
@@ -126,7 +126,7 @@ RSpec.describe FlakyTestTracker::Confinement do
         end
 
         it "generates source_location_url" do
-          subject.confine
+          subject.track
 
           expect(source).to have_received(:file_source_location_uri).with(
             file_path: test_input_attributes[:file_path],
@@ -135,7 +135,7 @@ RSpec.describe FlakyTestTracker::Confinement do
         end
 
         it "updates Test with number_occurrences incremented by 1" do
-          subject.confine
+          subject.track
 
           expect(storage).to have_received(:update).with(
             test.id,
@@ -148,20 +148,20 @@ RSpec.describe FlakyTestTracker::Confinement do
           )
         end
 
-        it "report confined_test" do
-          subject.confine
+        it "report tracked_test" do
+          subject.track
 
-          expect(reporter).to have_received(:confined_test).with(
+          expect(reporter).to have_received(:tracked_test).with(
             test: test_updated,
             source: source,
             context: context
           )
         end
 
-        it "report confined_tests" do
-          subject.confine
+        it "report tracked_tests" do
+          subject.track
 
-          expect(reporter).to have_received(:confined_tests).with(
+          expect(reporter).to have_received(:tracked_tests).with(
             tests: [test_updated],
             source: source,
             context: context
@@ -169,7 +169,7 @@ RSpec.describe FlakyTestTracker::Confinement do
         end
 
         it "returns updated Tests" do
-          expect(subject.confine).to containing_exactly(test_updated)
+          expect(subject.track).to containing_exactly(test_updated)
         end
       end
 
@@ -191,7 +191,7 @@ RSpec.describe FlakyTestTracker::Confinement do
         end
 
         it "generates source_location_url" do
-          subject.confine
+          subject.track
 
           expect(source).to have_received(:file_source_location_uri).with(
             file_path: test_input_attributes[:file_path],
@@ -200,7 +200,7 @@ RSpec.describe FlakyTestTracker::Confinement do
         end
 
         it "updates Test with number_occurrences equals to 1" do
-          subject.confine
+          subject.track
 
           expect(storage).to have_received(:create).with(
             FlakyTestTracker::TestInput.new(
@@ -212,20 +212,20 @@ RSpec.describe FlakyTestTracker::Confinement do
           )
         end
 
-        it "report confined_test" do
-          subject.confine
+        it "report tracked_test" do
+          subject.track
 
-          expect(reporter).to have_received(:confined_test).with(
+          expect(reporter).to have_received(:tracked_test).with(
             test: test_created,
             source: source,
             context: context
           )
         end
 
-        it "report confined_tests" do
-          subject.confine
+        it "report tracked_tests" do
+          subject.track
 
-          expect(reporter).to have_received(:confined_tests).with(
+          expect(reporter).to have_received(:tracked_tests).with(
             tests: [test_created],
             source: source,
             context: context
@@ -233,7 +233,7 @@ RSpec.describe FlakyTestTracker::Confinement do
         end
 
         it "returns created Tests" do
-          expect(subject.confine).to containing_exactly(test_created)
+          expect(subject.track).to containing_exactly(test_created)
         end
       end
     end

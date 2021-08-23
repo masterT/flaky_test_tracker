@@ -4,9 +4,9 @@ module FlakyTestTracker
   module Reporters
     # Base reporter.
     class BaseReporter
-      def confined_test(test:, source:, context:); end
+      def tracked_test(test:, source:, context:); end
 
-      def confined_tests(tests:, source:, context:); end
+      def tracked_tests(tests:, source:, context:); end
 
       def deconfined_test(test:, confinement_duration:); end
 

@@ -8,15 +8,15 @@ RSpec.describe FlakyTestTracker::Reporter do
   let(:source) { spy("source") }
   let(:context) { spy("context") }
 
-  describe "confined_test" do
+  describe "tracked_test" do
     it "report to reporters" do
-      subject.confined_test(
+      subject.tracked_test(
         test: test,
         source: source,
         context: context
       )
 
-      expect(reporter).to have_received(:confined_test).with(
+      expect(reporter).to have_received(:tracked_test).with(
         test: test,
         source: source,
         context: context
@@ -24,17 +24,17 @@ RSpec.describe FlakyTestTracker::Reporter do
     end
   end
 
-  describe "confined_tests" do
+  describe "tracked_tests" do
     let(:tests) { [test] }
 
     it "report to reporters" do
-      subject.confined_tests(
+      subject.tracked_tests(
         tests: tests,
         source: source,
         context: context
       )
 
-      expect(reporter).to have_received(:confined_tests).with(
+      expect(reporter).to have_received(:tracked_tests).with(
         tests: tests,
         source: source,
         context: context

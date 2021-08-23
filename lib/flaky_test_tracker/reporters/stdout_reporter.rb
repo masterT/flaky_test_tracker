@@ -7,9 +7,9 @@ module FlakyTestTracker
       DAY_IN_SECOND = 86_400
 
       # rubocop:disable Lint/UnusedMethodArgument
-      def confined_tests(tests:, source:, context:)
+      def tracked_tests(tests:, source:, context:)
         $stdout.puts(
-          "\n[FlakyTestTracker] #{tests.length} test(s) confined"
+          "\n[FlakyTestTracker] #{tests.length} test(s) tracked"
         )
       end
       # rubocop:enable Lint/UnusedMethodArgument

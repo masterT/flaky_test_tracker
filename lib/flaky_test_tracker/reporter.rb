@@ -9,15 +9,15 @@ module FlakyTestTracker
       @reporters = reporters
     end
 
-    def confined_test(test:, source:, context:)
+    def tracked_test(test:, source:, context:)
       reporters.each do |reporter|
-        reporter.confined_test(test: test, source: source, context: context)
+        reporter.tracked_test(test: test, source: source, context: context)
       end
     end
 
-    def confined_tests(tests:, source:, context:)
+    def tracked_tests(tests:, source:, context:)
       reporters.each do |reporter|
-        reporter.confined_tests(tests: tests, source: source, context: context)
+        reporter.tracked_tests(tests: tests, source: source, context: context)
       end
     end
 

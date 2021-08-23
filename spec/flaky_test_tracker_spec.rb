@@ -33,8 +33,8 @@ RSpec.describe FlakyTestTracker do
       }
     end
 
-    it "returns an instance of FlakyTestTracker::Confinement" do
-      expect(described_class.confinement(**arguments)).to be_a(FlakyTestTracker::Confinement)
+    it "returns an instance of FlakyTestTracker::Tracker" do
+      expect(described_class.confinement(**arguments)).to be_a(FlakyTestTracker::Tracker)
     end
   end
 

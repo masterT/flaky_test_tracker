@@ -11,7 +11,7 @@ require_relative "flaky_test_tracker/rendering"
 require_relative "flaky_test_tracker/reporter"
 require_relative "flaky_test_tracker/reporters/base_reporter"
 require_relative "flaky_test_tracker/reporters/stdout_reporter"
-require_relative "flaky_test_tracker/confinement"
+require_relative "flaky_test_tracker/tracker"
 require_relative "flaky_test_tracker/deconfinement"
 
 # Flaky test tracker.
@@ -19,7 +19,7 @@ module FlakyTestTracker
   class Error < StandardError; end
 
   def self.confinement(**arguments)
-    FlakyTestTracker::Confinement.new(
+    FlakyTestTracker::Tracker.new(
       storage: storage(**arguments[:storage]),
       context: arguments[:context],
       source: source(**arguments[:source]),

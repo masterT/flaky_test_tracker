@@ -8,16 +8,16 @@ RSpec.describe FlakyTestTracker::Reporters::STDOUTReporter do
   let(:source) { spy("source") }
   let(:confinement_duration) { 86_400 * 40 }
 
-  describe "#confined_test" do
+  describe "#tracked_test" do
     it "does not output to STDOUT" do
-      expect { subject.confined_test(test: test, source: source, context: context) }.not_to output.to_stdout
+      expect { subject.tracked_test(test: test, source: source, context: context) }.not_to output.to_stdout
     end
   end
 
-  describe "#confined_tests" do
+  describe "#tracked_tests" do
     it "outputs to STDOUT" do
-      expect { subject.confined_tests(tests: tests, source: source, context: context) }.to \
-        output("\n[FlakyTestTracker] #{tests.length} test(s) confined\n").to_stdout
+      expect { subject.tracked_tests(tests: tests, source: source, context: context) }.to \
+        output("\n[FlakyTestTracker] #{tests.length} test(s) tracked\n").to_stdout
     end
   end
 
