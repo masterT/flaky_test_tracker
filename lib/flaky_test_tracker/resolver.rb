@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module FlakyTestTracker
-  # Test deconfinement.
-  class Deconfinement
+  # Test resolver.
+  class Resolver
     DAY_IN_SECOND = 86_400
     DEFAULT_CONFINEMENT_DURATION = 40 * DAY_IN_SECOND
 
@@ -18,21 +18,21 @@ module FlakyTestTracker
       @confinement_duration = confinement_duration
     end
 
-    def deconfine
-      deconfined_tests = tests_to_deconfine.map { |test| deconfine_test(test) }
-      reporter.deconfined_tests(tests: deconfined_tests, confinement_duration: confinement_duration)
-      deconfined_tests
+    def resolve
+      resolved_tests = tests_to_resolve.map { |test| resolve_test(test) }
+      reporter.resolved_tests(tests: resolved_tests, confinement_duration: confinement_duration)
+      resolved_tests
     end
 
     private
 
-    def deconfine_test(test)
-      deconfined_test = storage.delete(test.id)
-      reporter.deconfined_test(test: deconfined_test, confinement_duration: confinement_duration)
-      deconfined_test
+    def resolve_test(test)
+      resolved_test = storage.delete(test.id)
+      reporter.resolved_test(test: resolved_test, confinement_duration: confinement_duration)
+      resolved_test
     end
 
-    def tests_to_deconfine
+    def tests_to_resolve
       tests.select do |test|
         test.finished_at <= Time.now - confinement_duration
       end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe FlakyTestTracker::Deconfinement do
+RSpec.describe FlakyTestTracker::Resolver do
   subject do
     described_class.new(
       storage: storage,
@@ -14,12 +14,12 @@ RSpec.describe FlakyTestTracker::Deconfinement do
   let(:reporter) do
     instance_double(
       FlakyTestTracker::Reporter,
-      deconfined_test: nil,
-      deconfined_tests: nil
+      resolved_test: nil,
+      resolved_tests: nil
     )
   end
 
-  describe "#deconfine" do
+  describe "#resolve" do
     let(:now) { Time.now }
 
     before do
@@ -35,7 +35,7 @@ RSpec.describe FlakyTestTracker::Deconfinement do
       end
 
       it "fetch tests from storage" do
-        subject.deconfine
+        subject.resolve
 
         expect(storage).to have_received(:all)
       end
@@ -49,32 +49,32 @@ RSpec.describe FlakyTestTracker::Deconfinement do
           allow(storage).to receive(:delete).and_return(test_deleted)
         end
 
-        it "report deconfined_test" do
-          subject.deconfine
+        it "report resolved_test" do
+          subject.resolve
 
-          expect(reporter).to have_received(:deconfined_test).with(
+          expect(reporter).to have_received(:resolved_test).with(
             test: test_deleted,
             confinement_duration: confinement_duration
           )
         end
 
-        it "report deconfined_tests" do
-          subject.deconfine
+        it "report resolved_tests" do
+          subject.resolve
 
-          expect(reporter).to have_received(:deconfined_tests).with(
+          expect(reporter).to have_received(:resolved_tests).with(
             tests: [test_deleted],
             confinement_duration: confinement_duration
           )
         end
 
         it "deletes the Test" do
-          subject.deconfine
+          subject.resolve
 
           expect(storage).to have_received(:delete).with(test.id)
         end
 
         it "returns deleted Test" do
-          expect(subject.deconfine).to containing_exactly(test_deleted)
+          expect(subject.resolve).to containing_exactly(test_deleted)
         end
       end
 
@@ -88,31 +88,31 @@ RSpec.describe FlakyTestTracker::Deconfinement do
         end
 
         it "deletes the Test" do
-          subject.deconfine
+          subject.resolve
 
           expect(storage).to have_received(:delete).with(test.id)
         end
 
-        it "report deconfined_test" do
-          subject.deconfine
+        it "report resolved_test" do
+          subject.resolve
 
-          expect(reporter).to have_received(:deconfined_test).with(
+          expect(reporter).to have_received(:resolved_test).with(
             test: test_deleted,
             confinement_duration: confinement_duration
           )
         end
 
-        it "report deconfined_tests" do
-          subject.deconfine
+        it "report resolved_tests" do
+          subject.resolve
 
-          expect(reporter).to have_received(:deconfined_tests).with(
+          expect(reporter).to have_received(:resolved_tests).with(
             tests: [test_deleted],
             confinement_duration: confinement_duration
           )
         end
 
         it "returns deleted Test" do
-          expect(subject.deconfine).to containing_exactly(test_deleted)
+          expect(subject.resolve).to containing_exactly(test_deleted)
         end
       end
 
@@ -126,13 +126,13 @@ RSpec.describe FlakyTestTracker::Deconfinement do
         end
 
         it "does not delete the Test" do
-          subject.deconfine
+          subject.resolve
 
           expect(storage).not_to have_received(:delete)
         end
 
         it "returns empty" do
-          expect(subject.deconfine).to be_empty
+          expect(subject.resolve).to be_empty
         end
       end
     end

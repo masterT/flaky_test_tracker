@@ -21,15 +21,15 @@ module FlakyTestTracker
       end
     end
 
-    def deconfined_test(test:, confinement_duration:)
+    def resolved_test(test:, confinement_duration:)
       reporters.each do |reporter|
-        reporter.deconfined_test(test: test, confinement_duration: confinement_duration)
+        reporter.resolved_test(test: test, confinement_duration: confinement_duration)
       end
     end
 
-    def deconfined_tests(tests:, confinement_duration:)
+    def resolved_tests(tests:, confinement_duration:)
       reporters.each do |reporter|
-        reporter.deconfined_tests(tests: tests, confinement_duration: confinement_duration)
+        reporter.resolved_tests(tests: tests, confinement_duration: confinement_duration)
       end
     end
   end

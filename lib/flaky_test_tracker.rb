@@ -12,7 +12,7 @@ require_relative "flaky_test_tracker/reporter"
 require_relative "flaky_test_tracker/reporters/base_reporter"
 require_relative "flaky_test_tracker/reporters/stdout_reporter"
 require_relative "flaky_test_tracker/tracker"
-require_relative "flaky_test_tracker/deconfinement"
+require_relative "flaky_test_tracker/resolver"
 
 # Flaky test tracker.
 module FlakyTestTracker
@@ -31,7 +31,7 @@ module FlakyTestTracker
   end
 
   def self.deconfinement(**arguments)
-    FlakyTestTracker::Deconfinement.new(
+    FlakyTestTracker::Resolver.new(
       storage: storage(**arguments[:storage]),
       reporter: reporter(
         reporters: arguments[:reporters],
