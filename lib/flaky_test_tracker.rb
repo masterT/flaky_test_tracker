@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "flaky_test_tracker/version"
+require_relative "flaky_test_tracker/error"
 require_relative "flaky_test_tracker/serializers/html_comment_serializer"
 require_relative "flaky_test_tracker/serializers/test_html_serializer"
 require_relative "flaky_test_tracker/sources/github_source"
@@ -16,8 +17,6 @@ require_relative "flaky_test_tracker/resolver"
 
 # Flaky test tracker.
 module FlakyTestTracker
-  class Error < StandardError; end
-
   def self.confinement(**arguments)
     FlakyTestTracker::Tracker.new(
       storage: storage(**arguments[:storage]),

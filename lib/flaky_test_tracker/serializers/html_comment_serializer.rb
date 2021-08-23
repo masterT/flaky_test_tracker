@@ -2,6 +2,7 @@
 
 require "base64"
 require "nokogiri"
+require_relative "../error"
 
 module FlakyTestTracker
   module Serializers
@@ -14,7 +15,7 @@ module FlakyTestTracker
         # We need to base64 encode since comment:
         # - can't start with: `>` or `->`
         # - can't include: `--`
-        content = Base64.encode64(value)
+        content = Base64.strict_encode64(value)
         comment = Nokogiri::XML::Comment.new(document, content)
         comment.to_html
       end
@@ -24,7 +25,11 @@ module FlakyTestTracker
       def deserialize(value)
         document = Nokogiri::HTML(value)
         comment = document.search(".//comment()").first
-        Base64.decode64(comment.content)
+        raise FlakyTestTracker::DeserializeError unless comment
+
+        Base64.strict_decode64(comment.content.strip)
+      rescue ArgumentError
+        raise FlakyTestTracker::DeserializeError
       end
     end
   end
