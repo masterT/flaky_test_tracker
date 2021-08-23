@@ -17,7 +17,7 @@ require_relative "flaky_test_tracker/resolver"
 
 # Flaky test tracker.
 module FlakyTestTracker
-  def self.confinement(**arguments)
+  def self.tracker(**arguments)
     FlakyTestTracker::Tracker.new(
       storage: storage(**arguments[:storage]),
       context: arguments[:context],
@@ -29,7 +29,7 @@ module FlakyTestTracker
     )
   end
 
-  def self.deconfinement(**arguments)
+  def self.resolver(**arguments)
     FlakyTestTracker::Resolver.new(
       storage: storage(**arguments[:storage]),
       reporter: reporter(

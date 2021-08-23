@@ -2,12 +2,12 @@
 
 require "flaky_test_tracker"
 
-confinement = FlakyTestTracker.confinement(
+tracker = FlakyTestTracker.tracker(
   verbose: true,
   source: {
     type: :github,
     options: {
-      repository: "masterT/flaky-test-tracker",
+      repository: "masterT/flaky_test_tracker",
       commit: "14d5052a1770724d205e4069cf44049cb3140efd",
       branch: "main"
     }
@@ -19,7 +19,7 @@ confinement = FlakyTestTracker.confinement(
       client: {
         access_token: ENV["GITHUB_ACCESS_TOKEN"]
       },
-      repository: "masterT/flaky-test-confinement-test",
+      repository: "masterT/flaky_test_tracker_test",
       labels: ["flaky test"]
     }
   }
@@ -27,12 +27,12 @@ confinement = FlakyTestTracker.confinement(
 
 RSpec.configure do |config|
   config.before(:suite) do
-    confinement.clear
+    tracker.clear
   end
 
   config.after do |example|
     if example.exception
-      confinement.add(
+      tracker.add(
         reference: example.id,
         description: example.full_description,
         exception: example.exception.to_s.gsub(/\x1b\[[0-9;]*[a-zA-Z]/, ""), # Remove ANSI formatting.
@@ -43,6 +43,6 @@ RSpec.configure do |config|
   end
 
   config.after(:suite) do
-    confinement.confine
+    tracker.track
   end
 end

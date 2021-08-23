@@ -5,7 +5,7 @@ RSpec.describe FlakyTestTracker do
     expect(FlakyTestTracker::VERSION).not_to be nil
   end
 
-  describe "::confinement" do
+  describe "::tracker" do
     let(:arguments) do
       {
         storage: {
@@ -34,11 +34,11 @@ RSpec.describe FlakyTestTracker do
     end
 
     it "returns an instance of FlakyTestTracker::Tracker" do
-      expect(described_class.confinement(**arguments)).to be_a(FlakyTestTracker::Tracker)
+      expect(described_class.tracker(**arguments)).to be_a(FlakyTestTracker::Tracker)
     end
   end
 
-  describe "::deconfinement" do
+  describe "::resolver" do
     let(:arguments) do
       {
         storage: {
@@ -58,7 +58,7 @@ RSpec.describe FlakyTestTracker do
     end
 
     it "returns an instance of FlakyTestTracker::Resolver" do
-      expect(described_class.deconfinement(**arguments)).to be_a(FlakyTestTracker::Resolver)
+      expect(described_class.resolver(**arguments)).to be_a(FlakyTestTracker::Resolver)
     end
   end
 
