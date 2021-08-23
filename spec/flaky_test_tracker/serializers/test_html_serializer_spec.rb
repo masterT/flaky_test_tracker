@@ -3,7 +3,7 @@
 RSpec.describe FlakyTestTracker::Serializers::TestHTMLSerializer do
   subject { described_class.new(html_serializer: html_serializer) }
 
-  let(:html_serializer) { instance_double(FlakyTestTracker::Serializers::HTMLSerializer) }
+  let(:html_serializer) { instance_double(FlakyTestTracker::Serializers::HTMLCommentSerializer) }
   let(:test) { build(:test) }
   let(:test_html) { "<!-- html -->" }
   let(:test_json) do
@@ -38,7 +38,7 @@ RSpec.describe FlakyTestTracker::Serializers::TestHTMLSerializer do
           described_class.new
         ).to have_attributes(
           html_serializer: an_instance_of(
-            FlakyTestTracker::Serializers::HTMLSerializer
+            FlakyTestTracker::Serializers::HTMLCommentSerializer
           )
         )
       end

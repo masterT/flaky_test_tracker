@@ -3,6 +3,7 @@
 require "time"
 require "json"
 require_relative "../test"
+require_relative "html_comment_serializer"
 
 module FlakyTestTracker
   module Serializers
@@ -10,7 +11,7 @@ module FlakyTestTracker
     class TestHTMLSerializer
       attr_reader :html_serializer
 
-      def initialize(html_serializer: HTMLSerializer.new)
+      def initialize(html_serializer: HTMLCommentSerializer.new)
         @html_serializer = html_serializer
       end
 

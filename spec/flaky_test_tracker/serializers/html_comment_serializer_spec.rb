@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe FlakyTestTracker::Serializers::HTMLSerializer do
+RSpec.describe FlakyTestTracker::Serializers::HTMLCommentSerializer do
   subject { described_class.new }
 
   let(:value) { "foo" }

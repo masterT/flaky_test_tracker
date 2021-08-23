@@ -5,8 +5,8 @@ require "nokogiri"
 
 module FlakyTestTracker
   module Serializers
-    # HTML serializer.
-    class HTMLSerializer
+    # HTML comment serializer.
+    class HTMLCommentSerializer
       # @param [String] value The value to serialize.
       # @return [String] The value to serialized as HTML comment.
       def serialize(value)
