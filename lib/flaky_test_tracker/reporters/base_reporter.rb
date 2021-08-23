@@ -8,9 +8,9 @@ module FlakyTestTracker
 
       def tracked_tests(tests:, source:, context:); end
 
-      def resolved_test(test:, confinement_duration:); end
+      def resolved_test(test:); end
 
-      def resolved_tests(tests:, confinement_duration:); end
+      def resolved_tests(tests:); end
     end
   end
 end

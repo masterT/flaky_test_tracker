@@ -6,7 +6,6 @@ RSpec.describe FlakyTestTracker::Reporters::STDOUTReporter do
   let(:tests) { [test] }
   let(:context) { spy("context") }
   let(:source) { spy("source") }
-  let(:confinement_duration) { 86_400 * 40 }
 
   describe "#tracked_test" do
     it "does not output to STDOUT" do
@@ -23,16 +22,14 @@ RSpec.describe FlakyTestTracker::Reporters::STDOUTReporter do
 
   describe "#resolved_test" do
     it "does not output to STDOUT" do
-      expect { subject.resolved_test(test: test, confinement_duration: confinement_duration) }.not_to output.to_stdout
+      expect { subject.resolved_test(test: test) }.not_to output.to_stdout
     end
   end
 
   describe "#resolved_tests" do
     it "outputs to STDOUT" do
-      days = (confinement_duration / 86_400).round(2)
-
-      expect { subject.resolved_tests(tests: tests, confinement_duration: confinement_duration) }.to \
-        output("\n[FlakyTestTracker] #{tests.length} test(s) resolved after #{days} of confinement\n").to_stdout
+      expect { subject.resolved_tests(tests: tests) }.to \
+        output("\n[FlakyTestTracker] #{tests.length} test(s) resolved\n").to_stdout
     end
   end
 end

@@ -53,7 +53,7 @@ RSpec.describe FlakyTestTracker do
         },
         verbose: true,
         reporters: [FlakyTestTracker::Reporters::BaseReporter.new],
-        confinement_duration: 86_400 * 10
+        duration_period_without_failure: 86_400 * 10
       }
     end
 

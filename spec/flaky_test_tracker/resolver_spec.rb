@@ -5,12 +5,12 @@ RSpec.describe FlakyTestTracker::Resolver do
     described_class.new(
       storage: storage,
       reporter: reporter,
-      confinement_duration: confinement_duration
+      duration_period_without_failure: duration_period_without_failure
     )
   end
 
   let(:storage) { spy("storage") }
-  let(:confinement_duration) { 40 * 86_400 }
+  let(:duration_period_without_failure) { 40 * 86_400 }
   let(:reporter) do
     instance_double(
       FlakyTestTracker::Reporter,
@@ -28,7 +28,7 @@ RSpec.describe FlakyTestTracker::Resolver do
 
     context "with Test" do
       let(:test) { build(:test) }
-      let(:test_deleted) { build(:test, test.serializable_hash) }
+      let(:test_resolved) { build(:test, test.serializable_hash) }
 
       before do
         allow(storage).to receive(:all).and_return([test])
@@ -40,99 +40,143 @@ RSpec.describe FlakyTestTracker::Resolver do
         expect(storage).to have_received(:all)
       end
 
-      context "when finished at < Time.now - confinement_duration" do
-        let(:test) do
-          build(:test, finished_at: now - confinement_duration - 1)
+      context "with block given" do
+        it "yield block with Test" do
+          expect { |b| subject.resolve(&b) }.to yield_with_args(test)
         end
 
-        before do
-          allow(storage).to receive(:delete).and_return(test_deleted)
+        context "when block result is true" do
+          let(:result) { true }
+
+          before do
+            allow(storage).to receive(:delete).and_return(test_resolved)
+          end
+
+          it "report resolved_test" do
+            subject.resolve { result }
+
+            expect(reporter).to have_received(:resolved_test).with(test: test_resolved)
+          end
+
+          it "report resolved_tests" do
+            subject.resolve { result }
+
+            expect(reporter).to have_received(:resolved_tests).with(tests: [test_resolved])
+          end
+
+          it "deletes the Test" do
+            subject.resolve { result }
+
+            expect(storage).to have_received(:delete).with(test.id)
+          end
+
+          it "returns deleted Test" do
+            expect(subject.resolve { result }).to containing_exactly(test_resolved)
+          end
         end
 
-        it "report resolved_test" do
-          subject.resolve
+        context "when block result is false" do
+          let(:result) { false }
 
-          expect(reporter).to have_received(:resolved_test).with(
-            test: test_deleted,
-            confinement_duration: confinement_duration
-          )
-        end
+          before do
+            allow(storage).to receive(:delete).and_return(test_resolved)
+          end
 
-        it "report resolved_tests" do
-          subject.resolve
+          it "does not delete the Test" do
+            subject.resolve { result }
 
-          expect(reporter).to have_received(:resolved_tests).with(
-            tests: [test_deleted],
-            confinement_duration: confinement_duration
-          )
-        end
+            expect(storage).not_to have_received(:delete)
+          end
 
-        it "deletes the Test" do
-          subject.resolve
-
-          expect(storage).to have_received(:delete).with(test.id)
-        end
-
-        it "returns deleted Test" do
-          expect(subject.resolve).to containing_exactly(test_deleted)
-        end
-      end
-
-      context "when finished at = Time.now - confinement_duration" do
-        let(:test) do
-          build(:test, finished_at: now - confinement_duration)
-        end
-
-        before do
-          allow(storage).to receive(:delete).and_return(test_deleted)
-        end
-
-        it "deletes the Test" do
-          subject.resolve
-
-          expect(storage).to have_received(:delete).with(test.id)
-        end
-
-        it "report resolved_test" do
-          subject.resolve
-
-          expect(reporter).to have_received(:resolved_test).with(
-            test: test_deleted,
-            confinement_duration: confinement_duration
-          )
-        end
-
-        it "report resolved_tests" do
-          subject.resolve
-
-          expect(reporter).to have_received(:resolved_tests).with(
-            tests: [test_deleted],
-            confinement_duration: confinement_duration
-          )
-        end
-
-        it "returns deleted Test" do
-          expect(subject.resolve).to containing_exactly(test_deleted)
+          it "returns empty" do
+            expect(subject.resolve { result }).to be_empty
+          end
         end
       end
 
-      context "when finished at > Time.now - confinement_duration" do
-        let(:test) do
-          build(:test, finished_at: now - confinement_duration + 1)
+      context "without block given" do
+        context "when finished at < Time.now - duration_period_without_failure" do
+          let(:test) do
+            build(:test, finished_at: now - duration_period_without_failure - 1)
+          end
+
+          before do
+            allow(storage).to receive(:delete).and_return(test_resolved)
+          end
+
+          it "report resolved_test" do
+            subject.resolve
+
+            expect(reporter).to have_received(:resolved_test).with(test: test_resolved)
+          end
+
+          it "report resolved_tests" do
+            subject.resolve
+
+            expect(reporter).to have_received(:resolved_tests).with(tests: [test_resolved])
+          end
+
+          it "deletes the Test" do
+            subject.resolve
+
+            expect(storage).to have_received(:delete).with(test.id)
+          end
+
+          it "returns deleted Test" do
+            expect(subject.resolve).to containing_exactly(test_resolved)
+          end
         end
 
-        before do
-          allow(storage).to receive(:delete).and_return(test_deleted)
+        context "when finished at = Time.now - duration_period_without_failure" do
+          let(:test) do
+            build(:test, finished_at: now - duration_period_without_failure)
+          end
+
+          before do
+            allow(storage).to receive(:delete).and_return(test_resolved)
+          end
+
+          it "deletes the Test" do
+            subject.resolve
+
+            expect(storage).to have_received(:delete).with(test.id)
+          end
+
+          it "report resolved_test" do
+            subject.resolve
+
+            expect(reporter).to have_received(:resolved_test).with(test: test_resolved)
+          end
+
+          it "report resolved_tests" do
+            subject.resolve
+
+            expect(reporter).to have_received(:resolved_tests).with(tests: [test_resolved])
+          end
+
+          it "returns deleted Test" do
+            expect(subject.resolve).to containing_exactly(test_resolved)
+          end
         end
 
-        it "does not delete the Test" do
-          subject.resolve
+        context "when finished at > Time.now - duration_period_without_failure" do
+          let(:test) do
+            build(:test, finished_at: now - duration_period_without_failure + 1)
+          end
 
-          expect(storage).not_to have_received(:delete)
-        end
+          before do
+            allow(storage).to receive(:delete).and_return(test_resolved)
+          end
 
-        it "returns empty" do
-          expect(subject.resolve).to be_empty
+          it "does not delete the Test" do
+            subject.resolve
+
+            expect(storage).not_to have_received(:delete)
+          end
+
+          it "returns empty" do
+            expect(subject.resolve).to be_empty
+          end
         end
       end
     end

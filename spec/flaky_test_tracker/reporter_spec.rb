@@ -43,35 +43,20 @@ RSpec.describe FlakyTestTracker::Reporter do
   end
 
   describe "resolved_test" do
-    let(:confinement_duration) { 40 * 86_400 }
-
     it "report to reporters" do
-      subject.resolved_test(
-        test: test,
-        confinement_duration: confinement_duration
-      )
+      subject.resolved_test(test: test)
 
-      expect(reporter).to have_received(:resolved_test).with(
-        test: test,
-        confinement_duration: confinement_duration
-      )
+      expect(reporter).to have_received(:resolved_test).with(test: test)
     end
   end
 
   describe "resolved_tests" do
-    let(:confinement_duration) { 40 * 86_400 }
     let(:tests) { [test] }
 
     it "report to reporters" do
-      subject.resolved_tests(
-        tests: tests,
-        confinement_duration: confinement_duration
-      )
+      subject.resolved_tests(tests: tests)
 
-      expect(reporter).to have_received(:resolved_tests).with(
-        tests: tests,
-        confinement_duration: confinement_duration
-      )
+      expect(reporter).to have_received(:resolved_tests).with(tests: tests)
     end
   end
 end
