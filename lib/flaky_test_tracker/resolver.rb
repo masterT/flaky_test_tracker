@@ -15,7 +15,7 @@ module FlakyTestTracker
     )
       @storage = storage
       @reporter = reporter
-      @duration_period_without_failure = duration_period_without_failure
+      @duration_period_without_failure = duration_period_without_failure || DEFAULT_DURATION_PERIOD_WITHOUT_FAILURE
     end
 
     # Resolve tests by removing them from the storage.

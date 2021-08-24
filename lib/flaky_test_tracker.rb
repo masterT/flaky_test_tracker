@@ -14,59 +14,37 @@ require_relative "flaky_test_tracker/reporters/base_reporter"
 require_relative "flaky_test_tracker/reporters/stdout_reporter"
 require_relative "flaky_test_tracker/tracker"
 require_relative "flaky_test_tracker/resolver"
+require_relative "flaky_test_tracker/configuration"
 
 # Flaky test tracker.
 module FlakyTestTracker
-  def self.tracker(**arguments)
-    FlakyTestTracker::Tracker.new(
-      storage: storage(**arguments[:storage]),
-      context: arguments[:context],
-      source: source(**arguments[:source]),
-      reporter: reporter(
-        reporters: arguments[:reporters],
-        verbose: arguments[:verbose]
-      )
-    )
-  end
+  class << self
+    attr_reader :configuration
 
-  # rubocop:disable Metrics/MethodLength
-  def self.resolver(**arguments)
-    FlakyTestTracker::Resolver.new(
-      duration_period_without_failure: arguments.fetch(
-        :duration_period_without_failure,
-        FlakyTestTracker::Resolver::DEFAULT_DURATION_PERIOD_WITHOUT_FAILURE
-      ),
-      storage: storage(**arguments[:storage]),
-      reporter: reporter(
-        reporters: arguments[:reporters],
-        verbose: arguments[:verbose]
-      )
-    )
-  end
-  # rubocop:enable Metrics/MethodLength
-
-  def self.storage(type:, options:)
-    case type
-    when :github_issue
-      FlakyTestTracker::Storage::GitHubIssueStorage.build(**options)
-    else
-      raise ArgumentError, "Unkown test repository type #{type.inspect}"
+    def configure
+      @configuration ||= Configuration.new
+      yield(configuration)
     end
-  end
 
-  def self.source(type:, options:)
-    case type
-    when :github
-      FlakyTestTracker::Sources::GitHubSource.build(**options)
-    else
-      raise ArgumentError, "Unkown source type #{type.inspect}"
+    def reset
+      @configuration = Configuration.new
     end
-  end
 
-  def self.reporter(reporters: [], verbose: false)
-    reporters << FlakyTestTracker::Reporters::STDOUTReporter.new if verbose
-    FlakyTestTracker::Reporter.new(
-      reporters: reporters
-    )
+    def tracker(context: {})
+      @tracker ||= FlakyTestTracker::Tracker.new(
+        storage: configuration.storage,
+        context: context,
+        source: configuration.source,
+        reporter: configuration.reporters
+      )
+    end
+
+    def resolver(duration_period_without_failure: nil)
+      @resolver ||= FlakyTestTracker::Resolver.new(
+        { duration_period_without_failure: duration_period_without_failure,
+          storage: configuration.storage,
+          reporter: configuration.reporters }.compact
+      )
+    end
   end
 end
