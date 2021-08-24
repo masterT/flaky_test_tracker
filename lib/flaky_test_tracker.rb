@@ -30,20 +30,19 @@ module FlakyTestTracker
       @configuration = Configuration.new
     end
 
-    def tracker(context: {})
+    def tracker
       @tracker ||= FlakyTestTracker::Tracker.new(
         storage: configuration.storage,
-        context: context,
+        context: configuration.context,
         source: configuration.source,
         reporter: configuration.reporters
       )
     end
 
-    def resolver(duration_period_without_failure: nil)
+    def resolver
       @resolver ||= FlakyTestTracker::Resolver.new(
-        { duration_period_without_failure: duration_period_without_failure,
-          storage: configuration.storage,
-          reporter: configuration.reporters }.compact
+        storage: configuration.storage,
+        reporter: configuration.reporters
       )
     end
   end

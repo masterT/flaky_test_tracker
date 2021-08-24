@@ -3,9 +3,10 @@
 module FlakyTestTracker
   # Configuration.
   class Configuration
-    attr_accessor :verbose
+    attr_accessor :verbose, :context
 
     def initialize
+      @context = {}
       @verbose = true
       @reporters = []
       @source_class = nil # NullSource
