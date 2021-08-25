@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 module FlakyTestTracker
-  # Configuration.
+  # Stores configuration information.
+  #
+  # @see FlakyTestTracker.configure
   class Configuration
     attr_accessor :verbose, :context, :reporter_classes
 
@@ -31,12 +33,17 @@ module FlakyTestTracker
         end
     end
 
+    # Set a custom {source_class}.
+    # @param [#build] source_class
     def source_class=(source_class)
       raise ArgumentError, "Expect source class to repond to build" unless source_class.respond_to?(:build)
 
       @source_class = source_class
     end
 
+    # Set the {source_options} that while by passed to the {source_class} using _build_.
+    # @param [Hash] source_options
+    # @return
     def source_options=(source_options)
       raise ArgumentError, "Expect source options to be a Hash" unless source_options.is_a?(Hash)
 
@@ -51,6 +58,7 @@ module FlakyTestTracker
       @source = source
     end
 
+    # @return [#file_source_location_uri #source_uri] Source instance.
     def source
       self.source = source_class.build(**source_options) unless @source
 
@@ -61,6 +69,11 @@ module FlakyTestTracker
       self.storage_class = Object.const_get(storage_class_name)
     end
 
+    # Set the {storage_class} for the _storage_type_.
+    #
+    # _github_issue_ -> {FlakyTestTracker::Storage::GitHubIssueStorage}
+    #
+    # @param [String, Symbol] storage_type
     def storage_type=(storage_type)
       self.storage_class =
         case storage_type.to_s
@@ -71,6 +84,8 @@ module FlakyTestTracker
         end
     end
 
+    # Set a custom {storage_class}.
+    # @param [#build] storage_class
     def storage_class=(storage_class)
       raise ArgumentError, "Expect storage class to repond to build" unless storage_class.respond_to?(:build)
 
@@ -91,13 +106,12 @@ module FlakyTestTracker
       @storage_options = storage_options
     end
 
+    # @return [#all #create #update #delete] Storage instance.
     def storage
       self.storage = storage_class.build(**storage_options) unless @storage
 
       @storage
     end
-
-    # ===
 
     def reporter_class_names=(reporter_class_names)
       @reporter_classes = reporter_class_names.map do |reporters_class_name|

@@ -2,9 +2,16 @@
 
 require "octokit"
 
+# rubocop:disable Metrics/ParameterLists
+
 module FlakyTestTracker
   module Storage
-    # GitHub issue test repository.
+    # Store {Test} on the GitHub Issue of a GitHub repository.
+    # @attr [#issue #create_issue #update_issue #close_issue] client GitHub client.
+    # @attr [Array<String>] labels GitHub Issue labels used to store tests.
+    # @attr [#output] title_rendering Template rendering used to create GitHub Issue title.
+    # @attr [#output] body_rendering Template rendering used to create GitHub Issue body.
+    # @attr [#serialize, #deserialize] serializer The serializer used to store the {Test} in the GitHub Issue body.
     class GitHubIssueStorage
       DEFAULT_LABELS = ["flaky test"].freeze
       DEFAULT_TITLE_TEMPLATE = "Flaky test <%= test.reference %>"
@@ -28,7 +35,18 @@ module FlakyTestTracker
         [<%= test.location %>](<%= test.source_location_url %>)
       ERB
 
-      # rubocop:disable Metrics/ParameterLists
+      # Returns a new instance of GitHubIssueStorage.
+      #
+      # @param [Hash] client The options passed to Octokit::Client#new (see https://octokit.github.io/octokit.rb/Octokit/Client.html).
+      # @param [String] repository GitHub repository name.
+      # @param [Array<String>] labels GitHub Issue labels used to store tests.
+      # @param [String] title_template ERB Template used to create and update GitHub Issue title,
+      #   the variable _test_ will be bind which represent the {Test} to store.
+      # @param [String] body_template ERB Template used to create and update GitHub Issue body,
+      #   the variable _test_ will be bind which represent the {Test} to store.
+      # @param [#serialize, #deserialize] serializer The serializer used to store the {Test} in the GitHub Issue body.
+      #
+      # @return [GitHubIssueStorage]
       def self.build(
         client:,
         repository:,
@@ -46,11 +64,9 @@ module FlakyTestTracker
           serializer: serializer
         )
       end
-      # rubocop:enable Metrics/ParameterLists
 
       attr_reader :client, :repository, :labels, :title_rendering, :body_rendering, :serializer
 
-      # rubocop:disable Metrics/ParameterLists
       def initialize(
         client:,
         repository:,
@@ -66,28 +82,29 @@ module FlakyTestTracker
         @body_rendering = body_rendering
         @serializer = serializer
       end
-      # rubocop:enable Metrics/ParameterLists
 
+      # Returns all the {Test} stored on GitHub Issue with state _open_ and with labels {#labels}.
       # @return [Array<Test>]
       def all
-        # https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#list_issues-instance_method
         client
           .list_issues(repository, { state: :open, labels: labels.join(",") })
           .map { |github_issue| to_model(github_issue) }
           .compact
       end
 
+      # Returns the {Test} stored on GitHub Issue having the given _id_.
       # @return [Test]
       def find(id)
-        # https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#issue-instance_method
         github_issue = client.issue(repository, id)
         to_model(github_issue)
       end
 
+      # Create the {Test} on GitHub Issue.
+      # The GitHub issue will have the labels specified by the {#labels}.
+      # @param [TestInput] test_input
       # @return [Test]
       def create(test_input)
         test = FlakyTestTracker::Test.new(test_input.serializable_hash)
-        # https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#create_issue-instance_method
         github_issue = client.create_issue(
           repository,
           render_title(test: test),
@@ -97,10 +114,13 @@ module FlakyTestTracker
         to_model(github_issue)
       end
 
+      # Update the {Test} on GitHub Issue having the given _id_.
+      # The GitHub issue will have the labels specified by the {#labels}.
+      # @param [String] id
+      # @param [TestInput] test_input
       # @return [Test]
       def update(id, test_input)
         test = FlakyTestTracker::Test.new(test_input.serializable_hash)
-        # https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#update_issue-instance_method
         github_issue = client.update_issue(
           repository,
           id,
@@ -111,9 +131,9 @@ module FlakyTestTracker
         to_model(github_issue)
       end
 
+      # Delete the {Test} on GitHub Issue having the given _id_.
       # @return [Test]
       def delete(id)
-        # https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#close_issue-instance_method
         github_issue = client.close_issue(
           repository,
           id
@@ -146,3 +166,4 @@ module FlakyTestTracker
     end
   end
 end
+# rubocop:enable Metrics/ParameterLists

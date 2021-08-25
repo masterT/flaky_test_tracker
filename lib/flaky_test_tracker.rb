@@ -19,20 +19,26 @@ require_relative "flaky_test_tracker/configuration"
 # Flaky test tracker.
 module FlakyTestTracker
   class << self
+    # @attr [Configuration] configuration
     attr_writer :configuration
 
+    # @return [Configuration] configuration
     def configuration
       @configuration ||= Configuration.new
     end
 
+    # Configure {FlakyTestTracker#configuration}.
+    # @yield [Configuration] Yield with the {FlakyTestTracker#configuration}.
     def configure
       yield(configuration)
     end
 
+    # Reset the the {FlakyTestTracker#configuration}.
     def reset
       @configuration = nil
     end
 
+    # @return [Tracker] Tracker configured with {FlakyTestTracker#configuration}.
     def tracker
       @tracker ||= FlakyTestTracker::Tracker.new(
         storage: configuration.storage,
@@ -42,6 +48,7 @@ module FlakyTestTracker
       )
     end
 
+    # @return [Resolver] Resolver configured with {FlakyTestTracker#configuration}.
     def resolver
       @resolver ||= FlakyTestTracker::Resolver.new(
         storage: configuration.storage,
