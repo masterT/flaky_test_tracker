@@ -36,7 +36,9 @@ RSpec.describe FlakyTestTracker::Configuration do
         let(:source_type) { "github" }
 
         it "sets source_class to FlakyTestTracker::Sources::GitHubSource" do
-          expect { subject.source_type = source_type }.to change(subject, :source_class).to(FlakyTestTracker::Sources::GitHubSource)
+          expect do
+            subject.source_type = source_type
+          end.to change(subject, :source_class).to(FlakyTestTracker::Sources::GitHubSource)
         end
       end
     end
@@ -322,7 +324,9 @@ RSpec.describe FlakyTestTracker::Configuration do
     end
 
     it "retreives class and sets reporter_classes" do
-      expect { subject.reporter_class_names = reporter_class_names }.to change(subject, :reporter_classes).to(reporter_classes)
+      expect do
+        subject.reporter_class_names = reporter_class_names
+      end.to change(subject, :reporter_classes).to(reporter_classes)
     end
   end
 
