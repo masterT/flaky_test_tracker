@@ -3,7 +3,9 @@
 module FlakyTestTracker
   # Configuration.
   class Configuration
-    attr_accessor :verbose, :context
+    attr_accessor :verbose, :context, :reporter_classes
+
+    attr_reader :source_class, :source_options, :storage_class, :storage_options, :reporters
 
     def initialize
       @context = {}
@@ -35,18 +37,18 @@ module FlakyTestTracker
       @source_class = source_class
     end
 
+    def source_options=(source_options)
+      raise ArgumentError, "Expect source options to be a Hash" unless source_options.is_a?(Hash)
+
+      @source_options = source_options
+    end
+
     def source=(source)
       source_methods = %i[file_source_location_uri source_uri]
       source_methods.each do |source_method|
         raise ArgumentError, "Expect source to respond to #{source_method}" unless source.respond_to?(source_method)
       end
       @source = source
-    end
-
-    def source_options=(source_options)
-      raise ArgumentError, "Expect source options to be a Hash" unless source_options.is_a?(Hash)
-
-      @source_options = source_options
     end
 
     def source
@@ -97,15 +99,13 @@ module FlakyTestTracker
 
     # ===
 
-    def reporters_class_names=(reporters_class_names)
-      self.reporters = reporters_class_names.map do |reporters_class_name|
+    def reporter_class_names=(reporter_class_names)
+      @reporter_classes = reporter_class_names.map do |reporters_class_name|
         Object.const_get(reporters_class_name)
       end
     end
 
     def reporters=(reporters)
-      raise ArgumentError, "Expect reporters to be an Enumerable" unless reporters.is_a?(Enumerable)
-
       reporter_methods = %i[tracked_test tracked_tests resolved_test resolved_tests]
       reporters.each do |reporter|
         reporter_methods.each do |reporter_method|
@@ -118,11 +118,17 @@ module FlakyTestTracker
       @reporters = reporters
     end
 
-    def reporters
+    def reporter
+      FlakyTestTracker::Reporter.new(reporters: build_reporters)
+    end
+
+    private
+
+    def build_reporters
       if verbose
-        [FlakyTestTracker::Reporters::STDOUTReporter.new] + @reporters
+        [FlakyTestTracker::Reporters::STDOUTReporter.new] + reporters
       else
-        @reporters
+        reporters
       end
     end
   end

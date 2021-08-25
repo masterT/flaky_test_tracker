@@ -28,12 +28,14 @@ module FlakyTestTracker
         [<%= test.location %>](<%= test.source_location_url %>)
       ERB
 
+      # rubocop:disable Metrics/ParameterLists
       def self.build(
         client:,
         repository:,
         labels: DEFAULT_LABELS,
         title_template: DEFAULT_TITLE_TEMPLATE,
-        body_template: DEFAULT_BODY_TEMPLATE
+        body_template: DEFAULT_BODY_TEMPLATE,
+        serializer: FlakyTestTracker::Serializers::TestHTMLSerializer.new
       )
         new(
           client: Octokit::Client.new(client.merge(auto_paginate: true)),
@@ -41,9 +43,10 @@ module FlakyTestTracker
           labels: labels,
           title_rendering: FlakyTestTracker::Rendering.new(template: title_template),
           body_rendering: FlakyTestTracker::Rendering.new(template: body_template),
-          serializer: FlakyTestTracker::Serializers::TestHTMLSerializer.new
+          serializer: serializer
         )
       end
+      # rubocop:enable Metrics/ParameterLists
 
       attr_reader :client, :repository, :labels, :title_rendering, :body_rendering, :serializer
 

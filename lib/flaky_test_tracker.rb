@@ -19,15 +19,18 @@ require_relative "flaky_test_tracker/configuration"
 # Flaky test tracker.
 module FlakyTestTracker
   class << self
-    attr_reader :configuration
+    attr_writer :configuration
+
+    def configuration
+      @configuration ||= Configuration.new
+    end
 
     def configure
-      @configuration ||= Configuration.new
       yield(configuration)
     end
 
     def reset
-      @configuration = Configuration.new
+      @configuration = nil
     end
 
     def tracker
@@ -35,14 +38,14 @@ module FlakyTestTracker
         storage: configuration.storage,
         context: configuration.context,
         source: configuration.source,
-        reporter: configuration.reporters
+        reporter: configuration.reporter
       )
     end
 
     def resolver
       @resolver ||= FlakyTestTracker::Resolver.new(
         storage: configuration.storage,
-        reporter: configuration.reporters
+        reporter: configuration.reporter
       )
     end
   end
