@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 module FlakyTestTracker
+  # rubocop:disable Metrics/ClassLength
+
   # Configuration.
   class Configuration
     attr_accessor :verbose, :context, :reporter_classes
 
-    attr_reader :source_class, :source_options, :storage_class, :storage_options, :reporters
+    attr_reader :source_class, :source_options, :storage_class, :storage_options
 
     def initialize
       @context = {}
@@ -118,6 +120,12 @@ module FlakyTestTracker
       @reporters = reporters
     end
 
+    def reporters
+      self.reporters = reporter_classes.map(&:new) unless @reporters
+
+      @reporters
+    end
+
     def reporter
       FlakyTestTracker::Reporter.new(reporters: build_reporters)
     end
@@ -132,4 +140,5 @@ module FlakyTestTracker
       end
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
