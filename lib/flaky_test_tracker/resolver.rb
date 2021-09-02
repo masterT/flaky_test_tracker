@@ -3,9 +3,10 @@
 module FlakyTestTracker
   # Test resolver.
   class Resolver
-    attr_reader :storage, :reporter
+    attr_reader :pretend, :storage, :reporter
 
-    def initialize(storage:, reporter:)
+    def initialize(pretend:, storage:, reporter:)
+      @pretend = pretend
       @storage = storage
       @reporter = reporter
     end
@@ -22,9 +23,15 @@ module FlakyTestTracker
     private
 
     def resolve_test(test)
-      resolved_test = storage.delete(test.id)
+      resolved_test = delete_test(test)
       reporter.resolved_test(test: resolved_test)
       resolved_test
+    end
+
+    def delete_test(test)
+      return test if pretend
+
+      storage.delete(test.id)
     end
 
     def tests

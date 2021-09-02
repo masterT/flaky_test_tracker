@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
 module FlakyTestTracker
+  # rubocop:disable Metrics/ClassLength, Metrics/ParameterLists
+
   # Test tracker.
   class Tracker
-    attr_reader :storage, :context, :source, :reporter, :test_inputs_attributes
+    attr_reader :pretend, :storage, :context, :source, :reporter, :test_inputs_attributes
 
-    def initialize(storage:, context:, source:, reporter:)
+    def initialize(pretend:, storage:, context:, source:, reporter:)
+      @pretend = pretend
       @storage = storage
       @context = context
       @source = source
@@ -14,7 +17,6 @@ module FlakyTestTracker
       @test_inputs_attributes = []
     end
 
-    # rubocop:disable Metrics/ParameterLists
     def add(
       reference:,
       description:,
@@ -32,7 +34,6 @@ module FlakyTestTracker
         finished_at: finished_at
       }
     end
-    # rubocop:enable Metrics/ParameterLists
 
     def track
       tracked_tests = test_inputs.map { |test_input| track_test(test_input) }
@@ -61,10 +62,22 @@ module FlakyTestTracker
     def persiste_test(test_input)
       test = find_test_by_reference(test_input.reference)
       if test
-        storage.update(test.id, test_input)
+        update_test(test, test_input)
       else
-        storage.create(test_input)
+        create_test(test_input)
       end
+    end
+
+    def update_test(test, test_input)
+      return test if pretend
+
+      storage.update(test.id, test_input)
+    end
+
+    def create_test(test_input)
+      return FlakyTestTracker::Test.new(test_input.serializable_hash) if pretend
+
+      storage.create(test_input)
     end
 
     def test_inputs
@@ -112,4 +125,5 @@ module FlakyTestTracker
       end
     end
   end
+  # rubocop:enable Metrics/ClassLength, Metrics/ParameterLists
 end

@@ -3,6 +3,7 @@
 RSpec.describe FlakyTestTracker::Tracker do
   subject do
     described_class.new(
+      pretend: pretend,
       storage: storage,
       context: context,
       source: source,
@@ -10,6 +11,7 @@ RSpec.describe FlakyTestTracker::Tracker do
     )
   end
 
+  let(:pretend) { false }
   let(:storage) { spy("storage") }
   let(:context) { spy("context") }
   let(:source) { spy("source") }
@@ -73,7 +75,7 @@ RSpec.describe FlakyTestTracker::Tracker do
     end
   end
 
-  describe "#confine" do
+  describe "#track" do
     context "when TestInput attributes added" do
       let(:file_source_location_uri) do
         URI("https://github.com/foo/bar/blob/0612bcf5b16a1ec368ef4ebb92d6be2f7040260b/spec/foo_spec.rb")
@@ -171,6 +173,20 @@ RSpec.describe FlakyTestTracker::Tracker do
         it "returns updated Tests" do
           expect(subject.track).to containing_exactly(test_updated)
         end
+
+        context "when pretend" do
+          let(:pretend) { true }
+
+          it "does not update Test" do
+            subject.track
+
+            expect(storage).not_to have_received(:update)
+          end
+
+          it "returns Tests found on storage" do
+            expect(subject.track).to containing_exactly(test)
+          end
+        end
       end
 
       context "when Test with the same reference exists" do
@@ -199,7 +215,7 @@ RSpec.describe FlakyTestTracker::Tracker do
           )
         end
 
-        it "updates Test with number_occurrences equals to 1" do
+        it "creates Test with number_occurrences equals to 1" do
           subject.track
 
           expect(storage).to have_received(:create).with(
@@ -234,6 +250,22 @@ RSpec.describe FlakyTestTracker::Tracker do
 
         it "returns created Tests" do
           expect(subject.track).to containing_exactly(test_created)
+        end
+
+        context "when pretend" do
+          let(:pretend) { true }
+
+          it "does not update Test" do
+            subject.track
+
+            expect(storage).not_to have_received(:create)
+          end
+
+          it "returns Tests initialized from TestInput attributes" do
+            expect(subject.track).to containing_exactly(
+              FlakyTestTracker::Test.new(test_input_attributes)
+            )
+          end
         end
       end
     end

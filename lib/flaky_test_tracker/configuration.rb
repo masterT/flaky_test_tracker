@@ -5,11 +5,12 @@ module FlakyTestTracker
 
   # Configuration.
   class Configuration
-    attr_accessor :verbose, :context, :reporter_classes
+    attr_accessor :pretend, :verbose, :context, :reporter_classes
 
     attr_reader :source_class, :source_options, :storage_class, :storage_options
 
     def initialize
+      @pretend = false
       @context = {}
       @verbose = true
       @reporters = []

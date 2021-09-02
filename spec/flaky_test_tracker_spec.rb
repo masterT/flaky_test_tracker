@@ -15,6 +15,7 @@ RSpec.describe FlakyTestTracker do
     let(:configuration) do
       instance_double(
         FlakyTestTracker::Configuration,
+        pretend: true,
         storage: double("storage"),
         context: double("context"),
         source: double("source"),
@@ -33,6 +34,7 @@ RSpec.describe FlakyTestTracker do
     it "returns an instance of FlakyTestTracker::Tracker" do
       expect(described_class.tracker).to be_a(FlakyTestTracker::Tracker).and(
         have_attributes(
+          pretend: configuration.pretend,
           storage: configuration.storage,
           context: configuration.context,
           source: configuration.source,
@@ -46,6 +48,7 @@ RSpec.describe FlakyTestTracker do
     let(:configuration) do
       instance_double(
         FlakyTestTracker::Configuration,
+        pretend: true,
         storage: double("storage"),
         reporter: double("reporter")
       )
@@ -62,6 +65,7 @@ RSpec.describe FlakyTestTracker do
     it "returns an instance of FlakyTestTracker::Resolver" do
       expect(described_class.resolver).to be_a(FlakyTestTracker::Resolver).and(
         have_attributes(
+          pretend: configuration.pretend,
           storage: configuration.storage,
           reporter: configuration.reporter
         )

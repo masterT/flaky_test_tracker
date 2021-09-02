@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe FlakyTestTracker::Resolver do
-  subject { described_class.new(storage: storage, reporter: reporter) }
+  subject { described_class.new(pretend: pretend, storage: storage, reporter: reporter) }
 
+  let(:pretend) { false }
   let(:storage) { spy("storage") }
   let(:reporter) do
     instance_double(
@@ -64,6 +65,20 @@ RSpec.describe FlakyTestTracker::Resolver do
 
         it "returns deleted Test" do
           expect(subject.resolve { result }).to containing_exactly(test_resolved)
+        end
+
+        context "when pretend" do
+          let(:pretend) { true }
+
+          it "does not delete the Test" do
+            subject.resolve { result }
+
+            expect(storage).not_to have_received(:delete)
+          end
+
+          it "returns Test" do
+            expect(subject.resolve { result }).to containing_exactly(test)
+          end
         end
       end
 

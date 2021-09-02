@@ -63,6 +63,7 @@ FlakyTestTracker.configure do |config|
   }
   config.reporters = []
   config.verbose = true
+  config.pretend = false
 end
 ```
 
