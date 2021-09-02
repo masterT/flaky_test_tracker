@@ -4,10 +4,11 @@
 
 [![Build](https://github.com/masterT/flaky_test_tracker/actions/workflows/build.yml/badge.svg)](https://github.com/masterT/flaky_test_tracker/actions/workflows/build.yml)
 
-Track flaky tests (i.e. those which fail non-deterministically) to help you fix them.
+FlakyTestTracker provides the tool to [track](#track) and [resolve](#resolve) flaky test (i.e. those which fail non-deterministically) in your project. It is agnostic of the testing framework and very customizable.
 
-Storage:
+It supports multiple storage to persiste tests:
 - GitHub Issue
+- Custom
 
 ## Installation
 
@@ -29,10 +30,135 @@ Or install it yourself as:
 $ gem install flaky_test_tracker
 ```
 
+## Documentation
+
+The documentation is available on [rubydoc.info](https://rubydoc.info/github/masterT/flaky_test_tracker).
+
+
 ## Usage
 
-...
+### Configuration
 
+The configuration is kept in the `FlakyTestTracker` module and used to track and resolve tests.
+
+```ruby
+FlakyTestTracker.configure do |config|
+  config.storage_type = :github_issue
+  config.storage_options = {
+    client: {
+      access_token: ENV['GITHUB_ACCESS_TOKEN']
+    },
+    repository: 'foo/bar',
+    labels: ['flaky test']
+  }
+  config.source_type = :github
+  config.source_options = {
+    repository: "foo/bar",
+    commit: ENV["CI_COMMIT"],
+    branch: ENV["CI_BRANCH"]
+  }
+  config.context = {
+    ci_build_id: ENV['CI_BUILD_ID'],
+    ci_build_url: ENV['CI_BUILD_URL']
+  }
+  config.reporters = []
+  config.verbose = true
+end
+```
+
+### Track
+
+You can track test for any testing framework as long as it can provide a unique _reference_ to identify the test.
+
+Reset the test attributes internal queue:
+
+```ruby
+FlakyTestTracker.tracker.clear
+```
+
+Add failing test attributes to the internal queue:
+
+```ruby
+FlakyTestTracker.tracker.add(
+  reference: "./spec/foo_spec.rb[1:2]",
+  description: "returns true when foo",
+  exception: %{
+    expected: true
+     got: false
+    (compared using ==)
+    Diff:
+    @@ -1 +1 @@
+    -true
+    +false
+  },
+  file_path: "./spec/foo_spec.rb",
+  line_number: 8
+)
+```
+
+Finally persiste the test on the configured storage:
+
+```ruby
+FlakyTestTracker.tracker.track
+```
+
+#### Examples
+
+Example with [RSpec](https://rubygems.org/gems/rspec) testing framework.
+
+```ruby
+RSpec.configure do |config|
+  config.before(:suite) do
+    FlakyTestTracker.tracker.clear
+  end
+
+  config.after do |example|
+    if example.exception
+      FlakyTestTracker.tracker.add(
+        reference: example.id,
+        description: example.full_description,
+        exception: example.exception.gsub(/\x1b\[[0-9;]*[a-zA-Z]/, ""), # Remove ANSI formatting.
+        file_path: example.metadata[:file_path],
+        line_number: example.metadata[:line_number]
+      )
+    end
+  end
+
+  config.after(:suite) do
+    FlakyTestTracker.tracker.track
+  rescue StandardError
+    # ...
+  end
+end
+```
+
+### Resolve
+
+You can resolve previously tracked tests, using you custom logic, this will remove the tests in the configued storage.
+
+Example this will only resolve tests with the last failing occurence occured 14 days ago.
+
+```ruby
+DAY_IN_SECOND = 86_400
+FlakyTestTracker.resolver.resolve do |test|
+  test.finished_at < Time.now - 14 * DAY_IN_SECOND
+end
+```
+
+It is useful to periodically resolve tests, example using a [Rake](https://rubygems.org/gems/rake) task.
+
+```ruby
+# frozen_string_literal: true
+namesapce :falky_test_tracker do
+  desc 'Resolve tests with the last failing occurence tracked 14 days ago'
+  task :resolve do
+    DAY_IN_SECOND = 86_400
+    FlakyTestTracker.resolver.resolve do |test|
+      test.finished_at < Time.now - 14 * DAY_IN_SECOND
+    end
+  end
+end
+```
 
 ## Development
 
