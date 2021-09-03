@@ -35,10 +35,10 @@ RSpec.describe FlakyTestTracker::Configuration do
       context "when github" do
         let(:source_type) { "github" }
 
-        it "sets source_class to FlakyTestTracker::Sources::GitHubSource" do
+        it "sets source_class to FlakyTestTracker::Source::GitHubSource" do
           expect do
             subject.source_type = source_type
-          end.to change(subject, :source_class).to(FlakyTestTracker::Sources::GitHubSource)
+          end.to change(subject, :source_class).to(FlakyTestTracker::Source::GitHubSource)
         end
       end
     end
@@ -314,7 +314,13 @@ RSpec.describe FlakyTestTracker::Configuration do
   end
 
   describe "#reporter_class_names=" do
-    let(:reporter_class) { Class.new }
+    let(:reporter_class) do
+      Class.new do
+        def self.build
+          new
+        end
+      end
+    end
     let(:reporter_classes) { [reporter_class] }
     let(:reporter_class_name) { "ReporterClass" }
     let(:reporter_class_names) { [reporter_class_name] }
@@ -331,11 +337,25 @@ RSpec.describe FlakyTestTracker::Configuration do
   end
 
   describe "#reporter_classes=" do
-    let(:reporter_class) { Class.new }
+    let(:reporter_class) do
+      Class.new do
+        def self.build
+          new
+        end
+      end
+    end
     let(:reporter_classes) { [reporter_class] }
 
     it "sets reporter_classes" do
       expect { subject.reporter_classes = reporter_classes }.to change(subject, :reporter_classes).to(reporter_classes)
+    end
+
+    context "when class does not repond to ::build" do
+      let(:reporter_class) { Class.new }
+
+      it "raises an ArgumentError" do
+        expect { subject.reporter_classes = reporter_classes }.to raise_error(ArgumentError, /build/i)
+      end
     end
   end
 
@@ -385,23 +405,25 @@ RSpec.describe FlakyTestTracker::Configuration do
     context "when verbose true" do
       let(:verbose) { true }
 
-      it "build FlakyTestTracker::Reporter with FlakyTestTracker::Reporters::STDOUTReporter + reporters" do
-        expect(subject.reporter).to be_a(FlakyTestTracker::Reporter).and(
+      # rubocop:disable Layout/LineLength
+      it "build FlakyTestTracker::Reporter::ProxyReporter with FlakyTestTracker::Reporter::STDOUTReporter + reporters" do
+        expect(subject.reporter).to be_a(FlakyTestTracker::Reporter::ProxyReporter).and(
           have_attributes(
             reporters: a_collection_containing_exactly(
-              an_instance_of(FlakyTestTracker::Reporters::STDOUTReporter),
+              an_instance_of(FlakyTestTracker::Reporter::STDOUTReporter),
               reporter
             )
           )
         )
       end
+      # rubocop:enable Layout/LineLength
     end
 
     context "when verbose false" do
       let(:verbose) { false }
 
-      it "build FlakyTestTracker::Reporter with reporters" do
-        expect(subject.reporter).to be_a(FlakyTestTracker::Reporter).and(
+      it "build FlakyTestTracker::Reporter::ProxyReporter with reporters" do
+        expect(subject.reporter).to be_a(FlakyTestTracker::Reporter::ProxyReporter).and(
           have_attributes(reporters: [reporter])
         )
       end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe FlakyTestTracker::Reporters::STDOUTReporter do
+RSpec.describe FlakyTestTracker::Reporter::STDOUTReporter do
   subject { described_class.new }
   let(:test) { build(:test) }
   let(:tests) { [test] }

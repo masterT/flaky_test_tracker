@@ -4,6 +4,12 @@ module FlakyTestTracker
   # rubocop:disable Metrics/ClassLength, Metrics/ParameterLists
 
   # Test tracker.
+  # @attr [Boolean] pretend Run but do not make any changes on the {#storage}
+  # @attr [#all #create #update #delete] storage
+  # @attr context
+  # @attr [#file_source_location_uri #source_uri] source
+  # @attr [ProxyReporter] reporter
+  # @attr [Array<Hash>] test_inputs_attributes
   class Tracker
     attr_reader :pretend, :storage, :context, :source, :reporter, :test_inputs_attributes
 
@@ -17,6 +23,14 @@ module FlakyTestTracker
       @test_inputs_attributes = []
     end
 
+    # Add test attributes to the internal queue.
+    # @param [String] reference Test unique reference.
+    # @param [String] description Test description.
+    # @param [String] exception Test exception message.
+    # @param [String] file_path Test source code file path.
+    # @param [Integer] line_number Test source code line number.
+    # @param [Time] finished_at The moment the test execution finished.
+    # @see TestInput.
     def add(
       reference:,
       description:,
@@ -35,16 +49,27 @@ module FlakyTestTracker
       }
     end
 
+    # For each test attributes in the internal queue.
+    # - build {TestInput}
+    #   - resolve {TestInput#source_location_url} with {#source}
+    #   - increments {TestInput#number_occurrences} when {Test} with the same reference is found on the {#storage}
+    # - persiste the {TestInput} on the storage
+    # - report tracked_test with persisted {Test}
+    # Then report tracked_tests with all persisted {Test}
+    # @return [Array<Test>]
     def track
       tracked_tests = test_inputs.map { |test_input| track_test(test_input) }
       reporter.tracked_tests(source: source, context: context, tests: tracked_tests)
       tracked_tests
     end
 
+    # All persisted {Test} on the {#storage}.
+    # @return [Array<Test>]
     def tests
       @tests ||= @storage.all
     end
 
+    # Reset the internal queue.
     def clear
       @tests = nil
       @test_inputs_attributes = []

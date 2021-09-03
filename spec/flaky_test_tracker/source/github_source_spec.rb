@@ -2,7 +2,7 @@
 
 require "uri"
 
-RSpec.describe FlakyTestTracker::Sources::GitHubSource do
+RSpec.describe FlakyTestTracker::Source::GitHubSource do
   subject do
     described_class.new(
       host: host,

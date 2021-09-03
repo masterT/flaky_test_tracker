@@ -11,11 +11,12 @@ module FlakyTestTracker
     class TestHTMLSerializer
       attr_reader :html_serializer
 
+      # @param [#serialize #deserialize] html_serializer
       def initialize(html_serializer: HTMLCommentSerializer.new)
         @html_serializer = html_serializer
       end
 
-      # @param [FlakyTestTracker::Test] test.
+      # @param [FlakyTestTracker::Test] test
       # @return [String] The HTML representing the test serialized.
       def serialize(test)
         html_serializer.serialize(
@@ -24,11 +25,14 @@ module FlakyTestTracker
       end
 
       # @param [String] html The HTML representing a FlakyTestTracker::Test.
+      # @raise FlakyTestTracker::Error::DeserializeError
       # @return [FlakyTestTracker::Test]
       def deserialize(html)
         from_json(
           html_serializer.deserialize(html)
         )
+      rescue ActiveSupport::JSON.parse_error
+        raise FlakyTestTracker::Error::DeserializeError
       end
 
       private

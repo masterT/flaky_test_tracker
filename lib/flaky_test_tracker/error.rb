@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 module FlakyTestTracker
-  class Error < StandardError; end
+  module Error
+    class Base < StandardError; end
 
-  # Raise when deserialization failed.
-  class DeserializeError < Error; end
+    # Raise when deserialization failed.
+    class DeserializeError < Base; end
+  end
 end

@@ -4,7 +4,16 @@ require "octokit"
 
 module FlakyTestTracker
   module Storage
-    # GitHub issue test repository.
+    # rubocop:disable Metrics/ParameterLists
+
+    # Store {Test} on the GitHub Issue of a GitHub repository.
+    # @attr [#issue #create_issue #update_issue #close_issue] client GitHub client.
+    # @attr [String] repository GitHub repository name with organization name or user name.
+    #   Ex: "masterT/flaky_test_tracker".
+    # @attr [Array<String>] labels GitHub Issue labels used to store tests.
+    # @attr [#output] title_rendering Template rendering used to create GitHub Issue title.
+    # @attr [#output] body_rendering Template rendering used to create GitHub Issue body.
+    # @attr [#serialize, #deserialize] serializer The serializer used to store the {Test} in the GitHub Issue body.
     class GitHubIssueStorage
       DEFAULT_LABELS = ["flaky test"].freeze
       DEFAULT_TITLE_TEMPLATE = "Flaky test <%= test.reference %>"
@@ -28,7 +37,18 @@ module FlakyTestTracker
         [<%= test.location %>](<%= test.source_location_url %>)
       ERB
 
-      # rubocop:disable Metrics/ParameterLists
+      # Returns a new instance of {GitHubIssueStorage}.
+      # @param [Hash] client The options used to initialize Octokit::Client.
+      # @param [String] repository GitHub repository name with organization name or user name.
+      #   Ex: "masterT/flaky_test_tracker".
+      # @param [Array<String>] labels GitHub Issue labels used to store tests.
+      # @param [String] title_template ERB Template used to render the GitHub Issue title.
+      #   The variable "test" will be bind to the ERB template which represent stored {Test}.
+      # @param [String] body_template ERB Template used to render the GitHub Issue body.
+      #   The variable "test" will be bind to the ERB template which represent stored {Test}.
+      # @param [#serialize #deserialize] serializer Serializer used to serialize/deserialize {Test}.
+      #   This will be prepend to the GitHub Issue body.
+      # @see https://rubygems.org/gems/octokit/versions/4.21.0
       def self.build(
         client:,
         repository:,
@@ -46,11 +66,9 @@ module FlakyTestTracker
           serializer: serializer
         )
       end
-      # rubocop:enable Metrics/ParameterLists
 
       attr_reader :client, :repository, :labels, :title_rendering, :body_rendering, :serializer
 
-      # rubocop:disable Metrics/ParameterLists
       def initialize(
         client:,
         repository:,
@@ -66,7 +84,6 @@ module FlakyTestTracker
         @body_rendering = body_rendering
         @serializer = serializer
       end
-      # rubocop:enable Metrics/ParameterLists
 
       # @return [Array<Test>]
       def all
@@ -139,10 +156,11 @@ module FlakyTestTracker
           test.id = github_issue.number.to_s
           test.url = github_issue[:html_url]
         end
-      rescue StandardError
-        # Handle malformed GitHub issue.
+      # Handle malformed GitHub Issue body.
+      rescue FlakyTestTracker::Error::DeserializeError
         nil
       end
     end
+    # rubocop:enable Metrics/ParameterLists
   end
 end

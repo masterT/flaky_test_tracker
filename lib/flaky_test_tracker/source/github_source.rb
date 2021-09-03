@@ -3,7 +3,7 @@
 require "uri"
 
 module FlakyTestTracker
-  module Sources
+  module Source
     # GitHub source.
     class GitHubSource
       DEFAULT_HOST = "github.com"

@@ -2,6 +2,9 @@
 
 module FlakyTestTracker
   # Test resolver.
+  # @attr [Boolean] pretend Run but do not make any changes on the {#storage}
+  # @attr [#all #create #update #delete] storage
+  # @attr [ProxyReporter] reporter
   class Resolver
     attr_reader :pretend, :storage, :reporter
 
@@ -12,10 +15,10 @@ module FlakyTestTracker
     end
 
     # Resolve tests by deleting them from the storage.
-    # @yield [test] Select the tests to resolve.
+    # @yield [test] Call block with each {Test} on the {#storage} and resolve those when block returns a truthy value.
     # @return [Array<Test>] resolved tests.
     def resolve(&block)
-      resolved_tests = tests.select(&block).map { |test| resolve_test(test) }
+      resolved_tests = storage.all.select(&block).map { |test| resolve_test(test) }
       reporter.resolved_tests(tests: resolved_tests)
       resolved_tests
     end
@@ -32,10 +35,6 @@ module FlakyTestTracker
       return test if pretend
 
       storage.delete(test.id)
-    end
-
-    def tests
-      @tests ||= @storage.all
     end
   end
 end

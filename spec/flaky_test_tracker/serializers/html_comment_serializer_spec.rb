@@ -25,16 +25,16 @@ RSpec.describe FlakyTestTracker::Serializers::HTMLCommentSerializer do
     context "with invalid HTML" do
       let(:html) { "<i-Ls'='=>=<<<nvalid" }
 
-      it "raises a FlakyTestTracker::DeserializeError" do
-        expect { subject.deserialize(html) }.to raise_error(FlakyTestTracker::DeserializeError)
+      it "raises a FlakyTestTracker::Error::DeserializeError" do
+        expect { subject.deserialize(html) }.to raise_error(FlakyTestTracker::Error::DeserializeError)
       end
     end
 
     context "with invalid HTML comment content" do
       let(:html) { "<!-- invalid -->" }
 
-      it "raises a FlakyTestTracker::DeserializeError" do
-        expect { subject.deserialize(html) }.to raise_error(FlakyTestTracker::DeserializeError)
+      it "raises a FlakyTestTracker::Error::DeserializeError" do
+        expect { subject.deserialize(html) }.to raise_error(FlakyTestTracker::Error::DeserializeError)
       end
     end
 

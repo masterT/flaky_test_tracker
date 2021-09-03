@@ -57,15 +57,166 @@ FlakyTestTracker.configure do |config|
     commit: ENV["CI_COMMIT"],
     branch: ENV["CI_BRANCH"]
   }
+  config.reporters = []
   config.context = {
     ci_build_id: ENV['CI_BUILD_ID'],
     ci_build_url: ENV['CI_BUILD_URL']
   }
-  config.reporters = []
   config.verbose = true
   config.pretend = false
 end
 ```
+
+#### Storage
+
+The storage is responsible of the test persistence.
+
+You can use configure the storage by specifing the type, class or class name of the storage along with the options. The `storage_options` will be passed the storage class method `::build` as keyword arguments using `**`.
+
+```ruby
+FlakyTestTracker.configure do |config|
+  config.storage_type = :github_issue
+  # or `config.storage_class = FlakyTestStorage::Storage::GitHubStorage`
+  # or `config.storage_class_name = "FlakyTestStorage::Storage::GitHubStorage"`
+  config.storage_options = {}
+end
+```
+
+Alternativly you can also specify the storage instance directly.
+
+```ruby
+FlakyTestTracker.configure do |config|
+  config.storage = FlakyTestStorage::Storage::GitHubStorage.build(**options)
+end
+```
+
+#### Source
+
+The source represents the current source code version on which tests are executed. It is used to resolves a test file location.
+
+You can use configure the source by specifing the type, class or class name of the source along with the options. The `source_options` will be passed the source class method `::build` as keyword arguments using `**`.
+
+```ruby
+FlakyTestTracker.configure do |config|
+  config.source_type = :github
+  # or `config.source_class = FlakyTestStorage::Source::GitHubSource`
+  # or `config.source_class_name = "FlakyTestStorage::Source::GitHubSource"`
+  config.source_options = {}
+end
+```
+
+Alternativly you can also specify the source instance directly.
+
+```ruby
+FlakyTestTracker.configure do |config|
+  config.source = FlakyTestStorage::Source::GitHubSource.build(**options)
+end
+```
+
+### Reports
+
+You can create reporters to report tracked test(s) and resolved test(s). This can be used to alert you team on your prefered communication channel (email, Slack, Discord, etc.).
+
+You can use configure the reporters by specifing the class or class name of the reporters. The method `::build` will be called on the each class to initialize the reporter.
+
+```ruby
+FlakyTestTracker.configure do |config|
+  config.reporters_classes = [MyReporter]
+  # or `config.reporters_classes = ["MyReporter"]`
+end
+```
+
+Alternativly you can also specify the storage instance directly.
+
+```ruby
+FlakyTestTracker.configure do |config|
+  config.reporters = [MyReporter.build]
+end
+```
+
+The [tracker](#tracker) calls every reporter with:
+
+- `tracked_test(test:, source:, context:)` - For each test tracked
+- `tracked_tests(tests:, source:, context:)` - For all tests tracked
+
+The [resolver](#resolver) calls every reporter with:
+
+- `resolved_test(test:)` - For each test resolved
+- `resolved_tests(tests:)` - For all tests resolved
+
+The create your reporter create a class with a `::build` method and inherit your class with `FlakyTestTracker::Reporter::BaseReporter`. Then override the methods you need.
+
+```ruby
+class MyReporter < FlakyTestTracker::Reporter::BaseReporter
+  def self.build
+    new
+  end
+
+  # @param tests [Test]
+  # @param source [#file_source_location_uri, #source_uri]
+  # @param context [Hash]
+  def tracked_test(test:, source:, context:)
+    # ...
+  end
+
+  # @param tests [Array<Test>]
+  # @param source [#file_source_location_uri, #source_uri]
+  # @param context [Hash]
+  def tracked_tests(tests:, source:, context:)
+    # ...
+  end
+
+  # @param test [Test]
+  def resolved_test(test:)
+    # ...
+  end
+
+  # @param tests [Array<Test>]
+  def resolved_tests(tests:)
+    # ...
+  end
+end
+```
+
+#### Context
+
+You can set a custom context that will be passed to your reporters for the methods `tracked_test` and `tracked_tests`. This is useful to identify the CI build in which the tests failed.
+
+```ruby
+FlakyTestTracker.configure do |config|
+  config.context = {}
+end
+```
+
+#### Verbose
+
+When set to `true`, the report `FlakyTestTracker::Reporter::STDOUTReporter` will be added to the configured [reporters](reporters).
+
+It will print verbose message in the `STDOUT`.
+
+```ruby
+FlakyTestTracker.configure do |config|
+  config.verbose = true
+end
+```
+
+Output example:
+
+```
+[FlakyTestTracker] 1 test(s) tracked
+[FlakyTestTracker] 1 test(s) resolved
+```
+
+#### Pretend
+
+When set to `true` the [tracker](#tracker) and [resolver](#resolver) will not make changes on the storage. This is usefull to test your configuration setup.
+
+```ruby
+FlakyTestTracker.configure do |config|
+  config.pretend = true
+end
+```
+
 
 ### Track
 

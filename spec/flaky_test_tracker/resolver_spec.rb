@@ -7,7 +7,7 @@ RSpec.describe FlakyTestTracker::Resolver do
   let(:storage) { spy("storage") }
   let(:reporter) do
     instance_double(
-      FlakyTestTracker::Reporter,
+      FlakyTestTracker::Reporter::BaseReporter,
       resolved_test: nil,
       resolved_tests: nil
     )

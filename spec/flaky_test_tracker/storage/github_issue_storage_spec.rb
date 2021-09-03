@@ -122,7 +122,7 @@ RSpec.describe FlakyTestTracker::Storage::GitHubIssueStorage do
 
     context "when issue is impossible to deserialize" do
       before do
-        allow(serializer).to receive(:deserialize).and_raise(StandardError)
+        allow(serializer).to receive(:deserialize).and_raise(FlakyTestTracker::Error::DeserializeError)
       end
 
       it "returns empty" do

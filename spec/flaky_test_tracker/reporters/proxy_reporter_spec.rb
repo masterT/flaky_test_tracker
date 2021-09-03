@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe FlakyTestTracker::Reporter do
+RSpec.describe FlakyTestTracker::Reporter::ProxyReporter do
   subject { described_class.new(reporters: [reporter]) }
 
   let(:reporter) { spy("reporter") }

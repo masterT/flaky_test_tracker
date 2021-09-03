@@ -17,7 +17,7 @@ RSpec.describe FlakyTestTracker::Tracker do
   let(:source) { spy("source") }
   let(:reporter) do
     instance_double(
-      FlakyTestTracker::Reporter,
+      FlakyTestTracker::Reporter::BaseReporter,
       tracked_test: nil,
       tracked_tests: nil
     )

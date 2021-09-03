@@ -5,9 +5,9 @@ module FlakyTestTracker
 
   # Configuration.
   class Configuration
-    attr_accessor :pretend, :verbose, :context, :reporter_classes
+    attr_accessor :pretend, :verbose, :context
 
-    attr_reader :source_class, :source_options, :storage_class, :storage_options
+    attr_reader :source_class, :source_options, :storage_class, :storage_options, :reporter_classes
 
     def initialize
       @pretend = false
@@ -28,7 +28,7 @@ module FlakyTestTracker
       self.source_class =
         case source_type.to_s
         when "github"
-          FlakyTestTracker::Sources::GitHubSource
+          FlakyTestTracker::Source::GitHubSource
         else
           raise ArgumentError, "Unkown source type #{source_type}"
         end
@@ -100,12 +100,18 @@ module FlakyTestTracker
       @storage
     end
 
-    # ===
-
     def reporter_class_names=(reporter_class_names)
-      @reporter_classes = reporter_class_names.map do |reporters_class_name|
+      self.reporter_classes = reporter_class_names.map do |reporters_class_name|
         Object.const_get(reporters_class_name)
       end
+    end
+
+    def reporter_classes=(reporter_classes)
+      reporter_classes.each do |reporter_class|
+        raise ArgumentError, "Expect report class to repond to build" unless reporter_class.respond_to?(:build)
+      end
+
+      @reporter_classes = reporter_classes
     end
 
     def reporters=(reporters)
@@ -122,20 +128,20 @@ module FlakyTestTracker
     end
 
     def reporters
-      self.reporters = reporter_classes.map(&:new) unless @reporters
+      self.reporters = reporter_classes.map(&:build) unless @reporters
 
       @reporters
     end
 
     def reporter
-      FlakyTestTracker::Reporter.new(reporters: build_reporters)
+      FlakyTestTracker::Reporter::ProxyReporter.new(reporters: build_reporters)
     end
 
     private
 
     def build_reporters
       if verbose
-        [FlakyTestTracker::Reporters::STDOUTReporter.new] + reporters
+        [FlakyTestTracker::Reporter::STDOUTReporter.new] + reporters
       else
         reporters
       end
