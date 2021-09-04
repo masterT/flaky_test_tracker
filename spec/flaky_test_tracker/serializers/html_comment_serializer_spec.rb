@@ -5,10 +5,11 @@ RSpec.describe FlakyTestTracker::Serializers::HTMLCommentSerializer do
 
   let(:value) { "foo" }
   let(:html) do
-    Nokogiri::XML::Comment.new(
-      Nokogiri::HTML::Document.new,
-      Base64.strict_encode64(value)
-    ).to_html
+    "<!--#{Base64.strict_encode64(value)}-->"
+    # Nokogiri::XML::Comment.new(
+    #   Nokogiri::HTML::Document.new,
+    #   Base64.strict_encode64(value)
+    # ).to_html
   end
 
   describe "#serialize" do
@@ -40,10 +41,11 @@ RSpec.describe FlakyTestTracker::Serializers::HTMLCommentSerializer do
 
     context "with HTML comment content encoded without strict" do
       let(:html) do
-        Nokogiri::XML::Comment.new(
-          Nokogiri::HTML::Document.new,
-          Base64.encode64(value)
-        ).to_html
+        "<!--#{Base64.encode64(value)}-->"
+        # Nokogiri::XML::Comment.new(
+        #   Nokogiri::HTML::Document.new,
+        #   Base64.encode64(value)
+        # ).to_html
       end
 
       it "returns deserialized value from HTML" do

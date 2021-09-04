@@ -29,8 +29,8 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "activemodel", ">= 6.0"
-  spec.add_dependency "nokogiri", "~> 1.11"
   spec.add_dependency "octokit", "~> 4.21"
+  spec.add_dependency "oga", "~> 3.3"
   spec.platform = Gem::Platform::RUBY
 
   # For more information and examples about making a new gem, checkout our
