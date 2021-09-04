@@ -4,7 +4,7 @@
 
 [![Build](https://github.com/masterT/flaky_test_tracker/actions/workflows/build.yml/badge.svg)](https://github.com/masterT/flaky_test_tracker/actions/workflows/build.yml)
 
-FlakyTestTracker provides the tool to [track](#track) and [resolve](#resolve) flaky test (i.e. those which fail non-deterministically) in your project. It is agnostic of the testing framework and very customizable.
+FlakyTestTracker is an agnostic testing framework and very customizable tool that [tracks](#track) and [resolves](#resolve) flaky tests (i.e. those which fail non-deterministically) in your project.
 
 It supports multiple storage to persiste tests:
 - GitHub Issue
