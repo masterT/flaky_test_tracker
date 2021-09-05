@@ -8,22 +8,6 @@ RSpec.describe FlakyTestTracker::Reporter::ProxyReporter do
   let(:source) { spy("source") }
   let(:context) { spy("context") }
 
-  describe "tracked_test" do
-    it "report to reporters" do
-      subject.tracked_test(
-        test: test,
-        source: source,
-        context: context
-      )
-
-      expect(reporter).to have_received(:tracked_test).with(
-        test: test,
-        source: source,
-        context: context
-      )
-    end
-  end
-
   describe "tracked_tests" do
     let(:tests) { [test] }
 
@@ -39,14 +23,6 @@ RSpec.describe FlakyTestTracker::Reporter::ProxyReporter do
         source: source,
         context: context
       )
-    end
-  end
-
-  describe "resolved_test" do
-    it "report to reporters" do
-      subject.resolved_test(test: test)
-
-      expect(reporter).to have_received(:resolved_test).with(test: test)
     end
   end
 

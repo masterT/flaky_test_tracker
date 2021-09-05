@@ -18,7 +18,6 @@ RSpec.describe FlakyTestTracker::Tracker do
   let(:reporter) do
     instance_double(
       FlakyTestTracker::Reporter::BaseReporter,
-      tracked_test: nil,
       tracked_tests: nil
     )
   end
@@ -150,16 +149,6 @@ RSpec.describe FlakyTestTracker::Tracker do
           )
         end
 
-        it "report tracked_test" do
-          subject.track
-
-          expect(reporter).to have_received(:tracked_test).with(
-            test: test_updated,
-            source: source,
-            context: context
-          )
-        end
-
         it "report tracked_tests" do
           subject.track
 
@@ -225,16 +214,6 @@ RSpec.describe FlakyTestTracker::Tracker do
                 source_location_url: file_source_location_uri.to_s
               )
             )
-          )
-        end
-
-        it "report tracked_test" do
-          subject.track
-
-          expect(reporter).to have_received(:tracked_test).with(
-            test: test_created,
-            source: source,
-            context: context
           )
         end
 

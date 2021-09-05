@@ -139,7 +139,7 @@ RSpec.describe FlakyTestTracker::Configuration do
         subject.source_options = source_options
       end
 
-      it "call build on the source_class" do
+      it "calls build on the source_class" do
         allow(source_class).to receive(:build).and_call_original
 
         subject.source
@@ -297,7 +297,7 @@ RSpec.describe FlakyTestTracker::Configuration do
         subject.storage_options = storage_options
       end
 
-      it "call build on the storage_class" do
+      it "calls build on the storage_class" do
         allow(storage_class).to receive(:build).and_call_original
 
         subject.storage
@@ -313,7 +313,7 @@ RSpec.describe FlakyTestTracker::Configuration do
     end
   end
 
-  describe "#reporter_class_names=" do
+  describe "#reporter_class_name=" do
     let(:reporter_class) do
       Class.new do
         def self.build
@@ -321,22 +321,20 @@ RSpec.describe FlakyTestTracker::Configuration do
         end
       end
     end
-    let(:reporter_classes) { [reporter_class] }
     let(:reporter_class_name) { "ReporterClass" }
-    let(:reporter_class_names) { [reporter_class_name] }
 
     before do
       stub_const(reporter_class_name, reporter_class)
     end
 
-    it "retreives class and sets reporter_classes" do
+    it "retreives class and sets reporter_class" do
       expect do
-        subject.reporter_class_names = reporter_class_names
-      end.to change(subject, :reporter_classes).to(reporter_classes)
+        subject.reporter_class_name = reporter_class_name
+      end.to change(subject, :reporter_class).to(reporter_class)
     end
   end
 
-  describe "#reporter_classes=" do
+  describe "#reporter_class=" do
     let(:reporter_class) do
       Class.new do
         def self.build
@@ -344,44 +342,82 @@ RSpec.describe FlakyTestTracker::Configuration do
         end
       end
     end
-    let(:reporter_classes) { [reporter_class] }
 
-    it "sets reporter_classes" do
-      expect { subject.reporter_classes = reporter_classes }.to change(subject, :reporter_classes).to(reporter_classes)
+    it "sets reporter_class" do
+      expect { subject.reporter_class = reporter_class }.to change(subject, :reporter_class).to(reporter_class)
     end
 
     context "when class does not repond to ::build" do
       let(:reporter_class) { Class.new }
 
       it "raises an ArgumentError" do
-        expect { subject.reporter_classes = reporter_classes }.to raise_error(ArgumentError, /build/i)
+        expect { subject.reporter_class = reporter_class }.to raise_error(ArgumentError, /build/i)
       end
     end
   end
 
-  describe "#reporters=" do
-    let(:reporter) do
-      double(
-        "reporter",
-        tracked_test: nil,
-        tracked_tests: nil,
-        resolved_test: nil,
-        resolved_tests: nil
-      )
+  describe "#reporter=" do
+    let(:reporter_options) { { foo: "bar" } }
+    let(:reporter_class) do
+      Class.new do
+        def self.build(foo:)
+          new(foo: foo)
+        end
+
+        attr_accessor :foo
+
+        def initialize(foo:)
+          @foo = foo
+        end
+
+        def tracked_tests(tests:, source:, context:); end
+
+        def resolved_tests(tests:); end
+      end
     end
-    let(:reporters) { [reporter] }
 
-    it "sets reporters" do
-      subject.reporters = reporters
+    context "when reporter_class and reporter_options are set" do
+      before do
+        subject.reporter_class = reporter_class
+        subject.reporter_options = reporter_options
+      end
 
-      expect(subject.reporters).to eql reporters
+      it "calls build on the reporter_class" do
+        allow(reporter_class).to receive(:build).and_call_original
+
+        subject.reporter
+
+        expect(reporter_class).to have_received(:build).with(reporter_options)
+      end
+
+      it "returns built reporter in FlakyTestTracker::Reporter::ProxyReporter" do
+        expect(subject.reporter).to be_a(FlakyTestTracker::Reporter::ProxyReporter).and(
+          have_attributes(
+            reporters: a_collection_including(
+              an_instance_of(reporter_class).and(
+                have_attributes(
+                  reporter_options
+                )
+              )
+            )
+          )
+        )
+      end
+    end
+  end
+
+  describe "#reporter_options=" do
+    let(:reporter_options) { { foo: "bar" } }
+
+    it "sets reporter_options" do
+      expect { subject.reporter_options = reporter_options }.to change(subject, :reporter_options).to(reporter_options)
     end
 
-    context "when reporter does not respond to tracked_test, tracked_tests, resolved_test, resolved_tests" do
-      let(:reporter) { double("reporter") }
+    context "when reporter_options is not a Hash" do
+      let(:reporter_options) { nil }
 
       it "raises an ArgumentError" do
-        expect { subject.reporters = reporters }.to raise_error(ArgumentError, /respond to/i)
+        expect { subject.reporter_options = reporter_options }.to raise_error(ArgumentError, /hash/i)
       end
     end
   end
@@ -390,16 +426,14 @@ RSpec.describe FlakyTestTracker::Configuration do
     let(:reporter) do
       double(
         "reporter",
-        tracked_test: nil,
         tracked_tests: nil,
-        resolved_test: nil,
         resolved_tests: nil
       )
     end
 
     before do
       subject.verbose = verbose
-      subject.reporters = [reporter]
+      subject.reporter = reporter
     end
 
     context "when verbose true" do
@@ -410,8 +444,8 @@ RSpec.describe FlakyTestTracker::Configuration do
         expect(subject.reporter).to be_a(FlakyTestTracker::Reporter::ProxyReporter).and(
           have_attributes(
             reporters: a_collection_containing_exactly(
-              an_instance_of(FlakyTestTracker::Reporter::STDOUTReporter),
-              reporter
+              reporter,
+              an_instance_of(FlakyTestTracker::Reporter::STDOUTReporter)
             )
           )
         )

@@ -4,18 +4,10 @@ module FlakyTestTracker
   module Reporter
     # Base reporter.
     class BaseReporter
-      # @param tests [Test]
-      # @param source [#file_source_location_uri, #source_uri]
-      # @param context [Hash]
-      def tracked_test(test:, source:, context:); end
-
       # @param tests [Array<Test>]
       # @param source [#file_source_location_uri, #source_uri]
       # @param context [Hash]
       def tracked_tests(tests:, source:, context:); end
-
-      # @param test [Test]
-      def resolved_test(test:); end
 
       # @param tests [Array<Test>]
       def resolved_tests(tests:); end

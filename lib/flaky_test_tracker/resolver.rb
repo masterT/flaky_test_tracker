@@ -26,12 +26,6 @@ module FlakyTestTracker
     private
 
     def resolve_test(test)
-      resolved_test = delete_test(test)
-      reporter.resolved_test(test: resolved_test)
-      resolved_test
-    end
-
-    def delete_test(test)
       return test if pretend
 
       storage.delete(test.id)

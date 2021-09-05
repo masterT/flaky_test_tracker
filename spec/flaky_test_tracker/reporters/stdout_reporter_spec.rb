@@ -7,22 +7,10 @@ RSpec.describe FlakyTestTracker::Reporter::STDOUTReporter do
   let(:context) { spy("context") }
   let(:source) { spy("source") }
 
-  describe "#tracked_test" do
-    it "does not output to STDOUT" do
-      expect { subject.tracked_test(test: test, source: source, context: context) }.not_to output.to_stdout
-    end
-  end
-
   describe "#tracked_tests" do
     it "outputs to STDOUT" do
       expect { subject.tracked_tests(tests: tests, source: source, context: context) }.to \
         output("\n[FlakyTestTracker] #{tests.length} test(s) tracked\n").to_stdout
-    end
-  end
-
-  describe "#resolved_test" do
-    it "does not output to STDOUT" do
-      expect { subject.resolved_test(test: test) }.not_to output.to_stdout
     end
   end
 

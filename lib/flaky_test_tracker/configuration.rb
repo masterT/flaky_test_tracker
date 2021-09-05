@@ -7,17 +7,18 @@ module FlakyTestTracker
   class Configuration
     attr_accessor :pretend, :verbose, :context
 
-    attr_reader :source_class, :source_options, :storage_class, :storage_options, :reporter_classes
+    attr_reader :source_class, :source_options, :storage_class, :storage_options, :reporter_class, :reporter_options
 
     def initialize
       @pretend = false
       @context = {}
       @verbose = true
-      @reporters = []
       @source_class = nil # NullSource
       @source_options = {}
       @storage_class = nil # NullStorage
       @storage_options = {}
+      @reporter_class = nil # NullReporter
+      @reporter_options = {}
     end
 
     def source_class_name=(source_class_name)
@@ -85,6 +86,7 @@ module FlakyTestTracker
       storage_methods.each do |storage_method|
         raise ArgumentError, "Expect storage to respond to #{storage_method}" unless storage.respond_to?(storage_method)
       end
+
       @storage = storage
     end
 
@@ -100,51 +102,52 @@ module FlakyTestTracker
       @storage
     end
 
-    def reporter_class_names=(reporter_class_names)
-      self.reporter_classes = reporter_class_names.map do |reporters_class_name|
-        Object.const_get(reporters_class_name)
-      end
+    def reporter_class_name=(reporter_class_name)
+      self.reporter_class = Object.const_get(reporter_class_name)
     end
 
-    def reporter_classes=(reporter_classes)
-      reporter_classes.each do |reporter_class|
-        raise ArgumentError, "Expect report class to repond to build" unless reporter_class.respond_to?(:build)
-      end
+    def reporter_class=(reporter_class)
+      raise ArgumentError, "Expect report class to repond to build" unless reporter_class.respond_to?(:build)
 
-      @reporter_classes = reporter_classes
+      @reporter_class = reporter_class
     end
 
-    def reporters=(reporters)
-      reporter_methods = %i[tracked_test tracked_tests resolved_test resolved_tests]
-      reporters.each do |reporter|
-        reporter_methods.each do |reporter_method|
-          unless reporter.respond_to?(reporter_method)
-            raise ArgumentError, "Expect reporter to respond to #{reporter_method}"
-          end
+    def reporter_options=(reporter_options)
+      raise ArgumentError, "Expect reporter options to be a Hash" unless reporter_options.is_a?(Hash)
+
+      @reporter_options = reporter_options
+    end
+
+    def reporter=(reporter)
+      reporter_methods = %i[tracked_tests resolved_tests]
+      reporter_methods.each do |reporter_method|
+        unless reporter.respond_to?(reporter_method)
+          raise ArgumentError, "Expect reporter to respond to #{reporter_method}"
         end
       end
 
-      @reporters = reporters
-    end
-
-    def reporters
-      self.reporters = reporter_classes.map(&:build) unless @reporters
-
-      @reporters
+      @reporter_instance = reporter
     end
 
     def reporter
-      FlakyTestTracker::Reporter::ProxyReporter.new(reporters: build_reporters)
+      FlakyTestTracker::Reporter::ProxyReporter.new(
+        reporters: reporters
+      )
     end
 
     private
 
-    def build_reporters
-      if verbose
-        [FlakyTestTracker::Reporter::STDOUTReporter.new] + reporters
-      else
-        reporters
-      end
+    def reporters
+      reporters = []
+      reporters << reporter_instance if reporter_instance
+      reporters << FlakyTestTracker::Reporter::STDOUTReporter.new if verbose
+      reporters
+    end
+
+    def reporter_instance
+      self.reporter = reporter_class.build(**reporter_options) unless @reporter_instance
+
+      @reporter_instance
     end
   end
   # rubocop:enable Metrics/ClassLength

@@ -8,7 +8,6 @@ RSpec.describe FlakyTestTracker::Resolver do
   let(:reporter) do
     instance_double(
       FlakyTestTracker::Reporter::BaseReporter,
-      resolved_test: nil,
       resolved_tests: nil
     )
   end
@@ -43,12 +42,6 @@ RSpec.describe FlakyTestTracker::Resolver do
 
         before do
           allow(storage).to receive(:delete).and_return(test_resolved)
-        end
-
-        it "report resolved_test" do
-          subject.resolve { result }
-
-          expect(reporter).to have_received(:resolved_test).with(test: test_resolved)
         end
 
         it "report resolved_tests" do

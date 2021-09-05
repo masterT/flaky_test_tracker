@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FlakyTestTracker
-  # rubocop:disable Metrics/ClassLength, Metrics/ParameterLists
+  # rubocop:disable Metrics/ParameterLists
 
   # Test tracker.
   # @attr [Boolean] pretend Run but do not make any changes on the {#storage}
@@ -79,12 +79,6 @@ module FlakyTestTracker
 
     def track_test(test_input)
       test_input.validate!
-      tracked_test = persiste_test(test_input)
-      reporter.tracked_test(source: source, context: context, test: tracked_test)
-      tracked_test
-    end
-
-    def persiste_test(test_input)
       test = find_test_by_reference(test_input.reference)
       if test
         update_test(test, test_input)
@@ -150,5 +144,5 @@ module FlakyTestTracker
       end
     end
   end
-  # rubocop:enable Metrics/ClassLength, Metrics/ParameterLists
+  # rubocop:enable Metrics/ParameterLists
 end

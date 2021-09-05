@@ -12,24 +12,10 @@ module FlakyTestTracker
         @reporters = reporters
       end
 
-      # @see BaseReporter#tracked_test
-      def tracked_test(test:, source:, context:)
-        reporters.each do |reporter|
-          reporter.tracked_test(test: test, source: source, context: context)
-        end
-      end
-
       # @see BaseReporter#tracked_tests
       def tracked_tests(tests:, source:, context:)
         reporters.each do |reporter|
           reporter.tracked_tests(tests: tests, source: source, context: context)
-        end
-      end
-
-      # @see BaseReporter#resolved_test
-      def resolved_test(test:)
-        reporters.each do |reporter|
-          reporter.resolved_test(test: test)
         end
       end
 
