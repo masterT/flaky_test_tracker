@@ -435,13 +435,6 @@ FlakyTestTracker.configuration.verbose
 # => true
 ```
 
-Output example:
-
-```
-[FlakyTestTracker] 1 test(s) tracked
-[FlakyTestTracker] 1 test(s) resolved
-```
-
 #### Pretend
 
 When set to `true` the [tracker](#tracker) and [resolver](#resolver) will not make changes on the configured [storage](#storage). This is useful to test your configuration setup.
