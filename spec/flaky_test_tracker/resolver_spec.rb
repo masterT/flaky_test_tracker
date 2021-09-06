@@ -76,7 +76,6 @@ RSpec.describe FlakyTestTracker::Resolver do
           end
         end
 
-
         it "deletes the Test" do
           subject.resolve { result }
 

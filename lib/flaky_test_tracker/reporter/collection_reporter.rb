@@ -5,8 +5,13 @@ module FlakyTestTracker
     # Reporter for a collection of reporter.
     # @attr [#tracked_test #tracked_tests #resolved_test #resolved_tests] reporters
     # @see BaseReporter
-    class ProxyReporter
+    class CollectionReporter
       attr_reader :reporters
+
+      # Returns a new instance of {CollectionReporter}.
+      def self.build(reporters:)
+        new(reporters: reporters)
+      end
 
       def initialize(reporters: [])
         @reporters = reporters
