@@ -7,11 +7,13 @@ RSpec.describe FlakyTestTracker::Tracker do
       storage: storage,
       context: context,
       source: source,
-      reporter: reporter
+      reporter: reporter,
+      verbose: verbose
     )
   end
 
   let(:pretend) { false }
+  let(:verbose) { false }
   let(:storage) { spy("storage") }
   let(:context) { spy("context") }
   let(:source) { spy("source") }
@@ -157,6 +159,24 @@ RSpec.describe FlakyTestTracker::Tracker do
             source: source,
             context: context
           )
+        end
+
+        context "when verbose is true" do
+          let(:verbose) { true }
+
+          it "outputs to STDOUT" do
+            expect { subject.track }.to output(
+              "\n[FlakyTestTracker][Tracker] 1 test(s) tracked\n"
+            ).to_stdout
+          end
+        end
+
+        context "when verbose is false" do
+          let(:verbose) { false }
+
+          it "does not output to STDOUT" do
+            expect { subject.track }.not_to output.to_stdout
+          end
         end
 
         it "returns updated Tests" do

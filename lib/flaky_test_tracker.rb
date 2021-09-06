@@ -45,6 +45,7 @@ module FlakyTestTracker
     def tracker
       @tracker ||= FlakyTestTracker::Tracker.new(
         pretend: configuration.pretend,
+        verbose: configuration.verbose,
         storage: configuration.storage,
         context: configuration.context,
         source: configuration.source,
@@ -56,6 +57,7 @@ module FlakyTestTracker
     def resolver
       @resolver ||= FlakyTestTracker::Resolver.new(
         pretend: configuration.pretend,
+        verbose: configuration.verbose,
         storage: configuration.storage,
         reporter: configuration.reporter
       )

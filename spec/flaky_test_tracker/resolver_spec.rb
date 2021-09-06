@@ -1,9 +1,17 @@
 # frozen_string_literal: true
 
 RSpec.describe FlakyTestTracker::Resolver do
-  subject { described_class.new(pretend: pretend, storage: storage, reporter: reporter) }
+  subject do
+    described_class.new(
+      pretend: pretend,
+      storage: storage,
+      reporter: reporter,
+      verbose: verbose
+    )
+  end
 
   let(:pretend) { false }
+  let(:verbose) { false }
   let(:storage) { spy("storage") }
   let(:reporter) do
     instance_double(
@@ -49,6 +57,25 @@ RSpec.describe FlakyTestTracker::Resolver do
 
           expect(reporter).to have_received(:resolved_tests).with(tests: [test_resolved])
         end
+
+        context "when verbose is true" do
+          let(:verbose) { true }
+
+          it "outputs to STDOUT" do
+            expect { subject.resolve { result } }.to output(
+              "\n[FlakyTestTracker][Resolver] 1 test(s) resolved\n"
+            ).to_stdout
+          end
+        end
+
+        context "when verbose is false" do
+          let(:verbose) { false }
+
+          it "does not output to STDOUT" do
+            expect { subject.resolve { result } }.not_to output.to_stdout
+          end
+        end
+
 
         it "deletes the Test" do
           subject.resolve { result }

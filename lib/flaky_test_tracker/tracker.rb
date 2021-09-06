@@ -8,17 +8,19 @@ module FlakyTestTracker
   # @attr [#all #create #update #delete] storage
   # @attr context
   # @attr [#file_source_location_uri #source_uri] source
-  # @attr [ProxyReporter] reporter
+  # @attr [#tracked_tests #resolved_tests] reporter
+  # @attr [Boolean] verbose
   # @attr [Array<Hash>] test_inputs_attributes
   class Tracker
-    attr_reader :pretend, :storage, :context, :source, :reporter, :test_inputs_attributes
+    attr_reader :pretend, :storage, :context, :source, :reporter, :verbose, :test_inputs_attributes
 
-    def initialize(pretend:, storage:, context:, source:, reporter:)
+    def initialize(pretend:, storage:, context:, source:, reporter:, verbose:)
       @pretend = pretend
       @storage = storage
       @context = context
       @source = source
       @reporter = reporter
+      @verbose = verbose
       @tests = nil
       @test_inputs_attributes = []
     end
@@ -60,6 +62,7 @@ module FlakyTestTracker
     def track
       tracked_tests = test_inputs.map { |test_input| track_test(test_input) }
       reporter.tracked_tests(source: source, context: context, tests: tracked_tests)
+      puts "\n[FlakyTestTracker][Tracker] #{tracked_tests.count} test(s) tracked" if verbose
       tracked_tests
     end
 

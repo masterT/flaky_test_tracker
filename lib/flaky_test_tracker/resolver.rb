@@ -4,14 +4,16 @@ module FlakyTestTracker
   # Test resolver.
   # @attr [Boolean] pretend Run but do not make any changes on the {#storage}
   # @attr [#all #create #update #delete] storage
-  # @attr [ProxyReporter] reporter
+  # @attr [#tracked_tests #resolved_tests] reporter
+  # @attr [Boolean] verbose
   class Resolver
-    attr_reader :pretend, :storage, :reporter
+    attr_reader :pretend, :storage, :reporter, :verbose
 
-    def initialize(pretend:, storage:, reporter:)
+    def initialize(pretend:, storage:, reporter:, verbose:)
       @pretend = pretend
       @storage = storage
       @reporter = reporter
+      @verbose = verbose
     end
 
     # Resolve tests by deleting them from the storage.
@@ -20,6 +22,7 @@ module FlakyTestTracker
     def resolve(&block)
       resolved_tests = storage.all.select(&block).map { |test| resolve_test(test) }
       reporter.resolved_tests(tests: resolved_tests)
+      puts "\n[FlakyTestTracker][Resolver] #{resolved_tests.count} test(s) resolved" if verbose
       resolved_tests
     end
 

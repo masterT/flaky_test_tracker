@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module FlakyTestTracker
-  # rubocop:disable Metrics/ClassLength
-
   # Configuration.
   class Configuration
     attr_accessor :pretend, :verbose, :context
@@ -126,29 +124,13 @@ module FlakyTestTracker
         end
       end
 
-      @reporter_instance = reporter
+      @reporter = reporter
     end
 
     def reporter
-      FlakyTestTracker::Reporter::ProxyReporter.new(
-        reporters: reporters
-      )
-    end
+      self.reporter = reporter_class.build(**reporter_options) unless @reporter
 
-    private
-
-    def reporters
-      reporters = []
-      reporters << reporter_instance if reporter_instance
-      reporters << FlakyTestTracker::Reporter::STDOUTReporter.new if verbose
-      reporters
-    end
-
-    def reporter_instance
-      self.reporter = reporter_class.build(**reporter_options) unless @reporter_instance
-
-      @reporter_instance
+      @reporter
     end
   end
-  # rubocop:enable Metrics/ClassLength
 end
