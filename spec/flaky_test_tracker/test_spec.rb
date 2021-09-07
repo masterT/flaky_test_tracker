@@ -15,4 +15,22 @@ RSpec.describe FlakyTestTracker::Test, type: :model do
       expect(subject.location).to eq("#{subject.file_path}:#{subject.line_number}")
     end
   end
+
+  describe "#resolved?" do
+    context "when resolved_at is not set" do
+      it "returns false" do
+        expect(subject.resolved?).to eq false
+      end
+    end
+
+    context "when resolved_at is set" do
+      before do
+        subject.resolved_at = Time.current
+      end
+
+      it "returns true" do
+        expect(subject.resolved?).to eq true
+      end
+    end
+  end
 end
