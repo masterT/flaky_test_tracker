@@ -39,6 +39,7 @@ RSpec.describe FlakyTestTracker::Tracker do
   describe "#add" do
     let(:test_input_attributes) do
       attributes_for(:test_input).except(
+        :resolved_at,
         :number_occurrences,
         :source_location_url
       )
@@ -83,6 +84,7 @@ RSpec.describe FlakyTestTracker::Tracker do
       end
       let(:test_input_attributes) do
         attributes_for(:test_input).except(
+          :resolved_at,
           :number_occurrences,
           :source_location_url
         )
@@ -117,6 +119,7 @@ RSpec.describe FlakyTestTracker::Tracker do
           build(
             :test,
             test.serializable_hash.merge(
+              resolved_at: nil,
               source_location_url: file_source_location_uri.to_s,
               number_occurrences: test.number_occurrences + 1
             )
@@ -144,6 +147,7 @@ RSpec.describe FlakyTestTracker::Tracker do
             test.id,
             FlakyTestTracker::TestInput.new(
               test_input_attributes.merge(
+                resolved_at: nil,
                 number_occurrences: test.number_occurrences + 1,
                 source_location_url: file_source_location_uri.to_s
               )
@@ -230,6 +234,7 @@ RSpec.describe FlakyTestTracker::Tracker do
           expect(storage).to have_received(:create).with(
             FlakyTestTracker::TestInput.new(
               test_input_attributes.merge(
+                resolved_at: nil,
                 number_occurrences: 1,
                 source_location_url: file_source_location_uri.to_s
               )
@@ -273,6 +278,7 @@ RSpec.describe FlakyTestTracker::Tracker do
       context "when TestInput attributes added" do
         let(:test_input_attributes) do
           attributes_for(:test_input).except(
+            :resolved_at,
             :number_occurrences,
             :source_location_url
           )
