@@ -174,7 +174,7 @@ FlakyTestTracker.configure do |config|
 end
 ```
 
-You can access the configuration instance with the `::configuration` method.
+You can access the configuration through the module `::configuration` method.
 
 ```ruby
 FlakyTestTracker.configuration
@@ -297,7 +297,7 @@ FlakyTestTracker.configuration.source
 You can use a custom source, the source class will need to have to the following interface:
 
 ```ruby
-class MyStorage
+class MySource
   def self.build(**options)
     new(**options)
   end
@@ -332,17 +332,17 @@ You can configure the reporter by specifying the class, or class name, along wit
 
 ```ruby
 FlakyTestTracker.configure do |config|
-  config.reporters_class = MyReporter
-  # or `config.reporters_class = "MyReporter"`
+  config.reporter_class = MyReporter
+  # or `config.reporter_class = "MyReporter"`
   config.reporter_options = {}
 end
 ```
 
-Alternatively, you can also specify the storage instance directly.
+Alternatively, you can also specify the reporter instance directly.
 
 ```ruby
 FlakyTestTracker.configure do |config|
-  config.reporters = MyReporter.build(**options)
+  config.reporter = MyReporter.build(**options)
 end
 ```
 
@@ -353,7 +353,7 @@ FlakyTestTracker.configuration.reporter
 # => #<MyReporter:0x00 ...>
 ```
 
-##### Reporters
+##### Reporter
 
 |Reporter Class|Documentation|
 |---|---|
