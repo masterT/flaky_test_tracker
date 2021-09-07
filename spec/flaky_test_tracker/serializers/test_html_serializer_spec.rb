@@ -9,7 +9,7 @@ RSpec.describe FlakyTestTracker::Serializers::TestHTMLSerializer do
   let(:test_json) do
     JSON.generate(
       "id" => test.id,
-      "url" => test.url,
+      "url" => test&.url,
       "reference" => test.reference,
       "description" => test.description,
       "exception" => test.exception,
@@ -17,7 +17,8 @@ RSpec.describe FlakyTestTracker::Serializers::TestHTMLSerializer do
       "line_number" => test.line_number,
       "source_location_url" => test.source_location_url,
       "number_occurrences" => test.number_occurrences,
-      "finished_at" => test.finished_at.iso8601(9)
+      "finished_at" => test.finished_at.iso8601(9),
+      "resolved_at" => test.resolved_at&.iso8601(9)
     )
   end
 
@@ -50,10 +51,22 @@ RSpec.describe FlakyTestTracker::Serializers::TestHTMLSerializer do
       allow(html_serializer).to receive(:serialize).and_return(test_html)
     end
 
-    it "serializes TestInput attributes as JSON" do
-      subject.serialize(test)
+    context "when Test is resolved" do
+      let(:test) { build(:test, resolved_at: Time.current) }
 
-      expect(html_serializer).to have_received(:serialize).with(test_json)
+      it "serializes Test attributes as JSON" do
+        subject.serialize(test)
+
+        expect(html_serializer).to have_received(:serialize).with(test_json)
+      end
+    end
+
+    context "when Test is not resolved" do
+      it "serializes Test attributes as JSON" do
+        subject.serialize(test)
+
+        expect(html_serializer).to have_received(:serialize).with(test_json)
+      end
     end
 
     it "returns HTML" do
@@ -66,13 +79,25 @@ RSpec.describe FlakyTestTracker::Serializers::TestHTMLSerializer do
       allow(html_serializer).to receive(:deserialize).and_return(test_json)
     end
 
-    it "deserialize TestInput attributes as JSON" do
-      subject.deserialize(test_html)
+    context "when Test is resolved" do
+      let(:test) { build(:test, resolved_at: Time.current) }
 
-      expect(html_serializer).to have_received(:deserialize).with(test_html)
+      it "deserialize Test attributes as JSON" do
+        subject.deserialize(test_html)
+
+        expect(html_serializer).to have_received(:deserialize).with(test_html)
+      end
     end
 
-    it "returns TestInput" do
+    context "when Test is not resolved" do
+      it "deserialize Test attributes as JSON" do
+        subject.deserialize(test_html)
+
+        expect(html_serializer).to have_received(:deserialize).with(test_html)
+      end
+    end
+
+    it "returns Test" do
       expect(subject.deserialize(test_html)).to eq(test)
     end
   end

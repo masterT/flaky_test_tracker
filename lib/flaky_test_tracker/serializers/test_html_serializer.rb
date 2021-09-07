@@ -7,6 +7,11 @@ require_relative "html_comment_serializer"
 
 module FlakyTestTracker
   module Serializers
+    TIME_ATTRIBUTE_NAMES = %w[
+      finished_at
+      resolved_at
+    ].freeze
+
     # Test HTML serializer.
     class TestHTMLSerializer
       attr_reader :html_serializer
@@ -40,8 +45,12 @@ module FlakyTestTracker
       def to_json(test)
         JSON.generate(
           test
-            .serializable_hash(except: :finished_at)
-            .merge("finished_at" => time_to_json(test.finished_at))
+            .serializable_hash(except: TIME_ATTRIBUTE_NAMES)
+            .merge(
+              TIME_ATTRIBUTE_NAMES.each_with_object({}) do |name, attributes|
+                attributes[name] = time_to_json(test.public_send(name))
+              end
+            )
         )
       end
 
@@ -50,7 +59,9 @@ module FlakyTestTracker
           JSON
             .parse(json)
             .tap do |attributes|
-              attributes["finished_at"] = time_from_json(attributes["finished_at"])
+              TIME_ATTRIBUTE_NAMES.each do |name|
+                attributes[name] = time_from_json(attributes[name])
+              end
             end
         )
       end
@@ -60,7 +71,12 @@ module FlakyTestTracker
       end
 
       def time_from_json(value)
-        Time.parse(value)
+        case value
+        when nil
+          nil
+        else
+          Time.parse(value)
+        end
       end
     end
   end
