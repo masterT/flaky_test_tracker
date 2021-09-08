@@ -135,36 +135,6 @@ RSpec.describe FlakyTestTracker::Storage::GitHubIssueStorage do
     end
   end
 
-  # describe "#find" do
-  #   let(:test) { build(:test) }
-  #   let(:id) { test.id }
-  #   let(:issue) { build(:github_issue, id: test.id, html_url: test.url) }
-
-  #   before do
-  #     allow(client).to receive(:issue).and_return(issue)
-  #     allow(serializer).to receive(:deserialize).and_return(test)
-  #   end
-
-  #   it "fetches the issue" do
-  #     subject.find(id)
-
-  #     expect(client).to have_received(:issue).with(
-  #       repository,
-  #       id
-  #     )
-  #   end
-
-  #   it "deserializes Test from issue body" do
-  #     subject.find(id)
-
-  #     expect(serializer).to have_received(:deserialize).with(issue.body)
-  #   end
-
-  #   it "returns Test list" do
-  #     expect(subject.find(id)).to eq(test)
-  #   end
-  # end
-
   describe "#create" do
     let(:test_html) { "<!-- html -->" }
     let(:test_input) { build(:test_input) }
