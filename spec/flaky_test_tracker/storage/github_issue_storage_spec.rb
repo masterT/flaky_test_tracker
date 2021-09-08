@@ -110,7 +110,7 @@ RSpec.describe FlakyTestTracker::Storage::GitHubIssueStorage do
 
       expect(client).to have_received(:list_issues).with(
         repository,
-        { state: :open, labels: labels.join(",") }
+        { labels: labels.join(",") }
       )
     end
 
@@ -135,35 +135,35 @@ RSpec.describe FlakyTestTracker::Storage::GitHubIssueStorage do
     end
   end
 
-  describe "#find" do
-    let(:test) { build(:test) }
-    let(:id) { test.id }
-    let(:issue) { build(:github_issue, id: test.id, html_url: test.url) }
+  # describe "#find" do
+  #   let(:test) { build(:test) }
+  #   let(:id) { test.id }
+  #   let(:issue) { build(:github_issue, id: test.id, html_url: test.url) }
 
-    before do
-      allow(client).to receive(:issue).and_return(issue)
-      allow(serializer).to receive(:deserialize).and_return(test)
-    end
+  #   before do
+  #     allow(client).to receive(:issue).and_return(issue)
+  #     allow(serializer).to receive(:deserialize).and_return(test)
+  #   end
 
-    it "fetches the issue" do
-      subject.find(id)
+  #   it "fetches the issue" do
+  #     subject.find(id)
 
-      expect(client).to have_received(:issue).with(
-        repository,
-        id
-      )
-    end
+  #     expect(client).to have_received(:issue).with(
+  #       repository,
+  #       id
+  #     )
+  #   end
 
-    it "deserializes Test from issue body" do
-      subject.find(id)
+  #   it "deserializes Test from issue body" do
+  #     subject.find(id)
 
-      expect(serializer).to have_received(:deserialize).with(issue.body)
-    end
+  #     expect(serializer).to have_received(:deserialize).with(issue.body)
+  #   end
 
-    it "returns Test list" do
-      expect(subject.find(id)).to eq(test)
-    end
-  end
+  #   it "returns Test list" do
+  #     expect(subject.find(id)).to eq(test)
+  #   end
+  # end
 
   describe "#create" do
     let(:test_html) { "<!-- html -->" }
@@ -266,22 +266,47 @@ RSpec.describe FlakyTestTracker::Storage::GitHubIssueStorage do
       )
     end
 
-    it "updates GitHub issue" do
-      subject.update(id, test_input)
+    context "when TestInput attribute resolved_at is present" do
+      let(:test_input) { build(:test_input, resolved_at: Time.now) }
+      let(:issue) { build(:github_issue, id: test.id, html_url: test.url, state: "closed") }
 
-      expected_title = title_rendering.output(test: test)
-      expected_body = [
-        test_html,
-        body_rendering.output(test: test)
-      ].join("\n")
+      it "updates GitHub issue with state closed" do
+        subject.update(id, test_input)
 
-      expect(client).to have_received(:update_issue).with(
-        repository,
-        id,
-        expected_title,
-        expected_body,
-        { labels: labels }
-      )
+        expected_title = title_rendering.output(test: test)
+        expected_body = [
+          test_html,
+          body_rendering.output(test: test)
+        ].join("\n")
+
+        expect(client).to have_received(:update_issue).with(
+          repository,
+          id,
+          expected_title,
+          expected_body,
+          { labels: labels, state: "closed" }
+        )
+      end
+    end
+
+    context "when TestInput attribute resolved_at is not present" do
+      it "updates GitHub issue with state open" do
+        subject.update(id, test_input)
+
+        expected_title = title_rendering.output(test: test)
+        expected_body = [
+          test_html,
+          body_rendering.output(test: test)
+        ].join("\n")
+
+        expect(client).to have_received(:update_issue).with(
+          repository,
+          id,
+          expected_title,
+          expected_body,
+          { labels: labels, state: "open" }
+        )
+      end
     end
 
     it "deserializes Test from issue body" do

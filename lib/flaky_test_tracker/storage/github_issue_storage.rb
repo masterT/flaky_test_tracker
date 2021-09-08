@@ -39,6 +39,7 @@ module FlakyTestTracker
 
       # Returns a new instance of {GitHubIssueStorage}.
       # @param [Hash] client The options used to initialize Octokit::Client.
+      #   It will be merged with `{auto_paginate:true}`.
       # @param [String] repository GitHub repository name with organization name or user name.
       #   Ex: "masterT/flaky_test_tracker".
       # @param [Array<String>] labels GitHub Issue labels used to store tests.
@@ -87,24 +88,17 @@ module FlakyTestTracker
 
       # @return [Array<Test>]
       def all
-        # https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#list_issues-instance_method
+        # See https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#list_issues-instance_method
         client
-          .list_issues(repository, { state: :open, labels: labels.join(",") })
+          .list_issues(repository, { labels: labels.join(",") })
           .map { |github_issue| to_model(github_issue) }
           .compact
       end
 
       # @return [Test]
-      def find(id)
-        # https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#issue-instance_method
-        github_issue = client.issue(repository, id)
-        to_model(github_issue)
-      end
-
-      # @return [Test]
       def create(test_input)
         test = FlakyTestTracker::Test.new(test_input.serializable_hash)
-        # https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#create_issue-instance_method
+        # See https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#create_issue-instance_method
         github_issue = client.create_issue(
           repository,
           render_title(test: test),
@@ -117,20 +111,21 @@ module FlakyTestTracker
       # @return [Test]
       def update(id, test_input)
         test = FlakyTestTracker::Test.new(test_input.serializable_hash)
-        # https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#update_issue-instance_method
+        # See https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#update_issue-instance_method
+        state = test.resolved? ? "closed" : "open"
         github_issue = client.update_issue(
           repository,
           id,
           render_title(test: test),
           render_body(test: test),
-          { labels: labels }
+          { labels: labels, state: state }
         )
         to_model(github_issue)
       end
 
       # @return [Test]
       def delete(id)
-        # https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#close_issue-instance_method
+        # See https://octokit.github.io/octokit.rb/Octokit/Client/Issues.html#close_issue-instance_method
         github_issue = client.close_issue(
           repository,
           id
