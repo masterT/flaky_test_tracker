@@ -8,7 +8,8 @@ RSpec.describe FlakyTestTracker::Tracker do
       context: context,
       source: source,
       reporter: reporter,
-      verbose: verbose
+      verbose: verbose,
+      test_input_factory: test_input_factory
     )
   end
 
@@ -17,11 +18,60 @@ RSpec.describe FlakyTestTracker::Tracker do
   let(:storage) { spy("storage") }
   let(:context) { spy("context") }
   let(:source) { spy("source") }
+  let(:test_input_factory) { spy("test_input_factory") }
   let(:reporter) do
     instance_double(
       FlakyTestTracker::Reporter::BaseReporter,
       tracked_tests: nil
     )
+  end
+
+  describe "::new" do
+    let(:attributes) do
+      {
+        pretend: pretend,
+        storage: storage,
+        context: context,
+        source: source,
+        reporter: reporter,
+        verbose: verbose,
+        test_input_factory: test_input_factory
+      }
+    end
+
+    it "initializes a new instance with attributes" do
+      expect(
+        described_class.new(**attributes)
+      ).to have_attributes(
+        attributes.merge(
+          test_inputs_attributes: []
+        )
+      )
+    end
+
+    context "with only required attributes" do
+      let(:attributes) do
+        {
+          pretend: pretend,
+          storage: storage,
+          context: context,
+          source: source,
+          reporter: reporter,
+          verbose: verbose
+        }
+      end
+
+      it "sets attributes using default values" do
+        expect(
+          described_class.new(**attributes)
+        ).to have_attributes(
+          attributes.merge(
+            test_inputs_attributes: [],
+            test_input_factory: an_instance_of(FlakyTestTracker::TestInputFactory)
+          )
+        )
+      end
+    end
   end
 
   describe "#tests" do
@@ -79,6 +129,7 @@ RSpec.describe FlakyTestTracker::Tracker do
 
   describe "#track" do
     context "when TestInput attributes added" do
+      let(:test_input) { build(:test_input) }
       let(:file_source_location_uri) do
         URI("https://github.com/foo/bar/blob/0612bcf5b16a1ec368ef4ebb92d6be2f7040260b/spec/foo_spec.rb")
       end
@@ -93,28 +144,11 @@ RSpec.describe FlakyTestTracker::Tracker do
       before do
         subject.add(**test_input_attributes)
 
-        allow(source).to receive(:file_source_location_uri).and_return(file_source_location_uri)
-      end
-
-      context "when TestInput attributes invalid" do
-        let(:test_input_attributes) do
-          {
-            reference: nil,
-            description: nil,
-            exception: nil,
-            file_path: nil,
-            line_number: nil,
-            finished_at: nil
-          }
-        end
-
-        it "raises an ActiveModel::ValidationError" do
-          expect { subject.track }.to raise_error(ActiveModel::ValidationError)
-        end
+        allow(test_input_factory).to receive(:build).and_return(test_input)
       end
 
       context "when Test with the same reference exists" do
-        let(:test) { build(:test, test_input_attributes) }
+        let(:test) { build(:test, reference: test_input_attributes[:reference]) }
         let(:test_updated) do
           build(
             :test,
@@ -131,27 +165,30 @@ RSpec.describe FlakyTestTracker::Tracker do
           allow(storage).to receive(:update).and_return(test_updated)
         end
 
-        it "generates source_location_url" do
+        it "builds TestInput with test_input_factory" do
           subject.track
 
-          expect(source).to have_received(:file_source_location_uri).with(
-            file_path: test_input_attributes[:file_path],
-            line_number: test_input_attributes[:line_number]
+          expect(test_input_factory).to have_received(:build).with(
+            test: test,
+            source: source,
+            attributes: test_input_attributes
           )
         end
 
-        it "updates Test with number_occurrences incremented by 1" do
+        context "when TestInput built by test_input_factory is invalid" do
+          let(:test_input) { FlakyTestTracker::TestInput.new }
+
+          it "raises an ActiveModel::ValidationError" do
+            expect { subject.track }.to raise_error(ActiveModel::ValidationError)
+          end
+        end
+
+        it "updates Test" do
           subject.track
 
           expect(storage).to have_received(:update).with(
             test.id,
-            FlakyTestTracker::TestInput.new(
-              test_input_attributes.merge(
-                resolved_at: nil,
-                number_occurrences: test.number_occurrences + 1,
-                source_location_url: file_source_location_uri.to_s
-              )
-            )
+            test_input
           )
         end
 
@@ -202,7 +239,7 @@ RSpec.describe FlakyTestTracker::Tracker do
         end
       end
 
-      context "when Test with the same reference exists" do
+      context "when Test with the same reference does not exist" do
         let(:test) { build(:test, reference: "another-test-reference") }
         let(:test_created) do
           build(
@@ -219,27 +256,22 @@ RSpec.describe FlakyTestTracker::Tracker do
           allow(storage).to receive(:create).and_return(test_created)
         end
 
-        it "generates source_location_url" do
+        it "builds TestInput with test_input_factory" do
           subject.track
 
-          expect(source).to have_received(:file_source_location_uri).with(
-            file_path: test_input_attributes[:file_path],
-            line_number: test_input_attributes[:line_number]
+          expect(test_input_factory).to have_received(:build).with(
+            test: nil,
+            source: source,
+            attributes: test_input_attributes
           )
         end
 
-        it "creates Test with number_occurrences equals to 1" do
-          subject.track
+        context "when TestInput built by test_input_factory is invalid" do
+          let(:test_input) { FlakyTestTracker::TestInput.new }
 
-          expect(storage).to have_received(:create).with(
-            FlakyTestTracker::TestInput.new(
-              test_input_attributes.merge(
-                resolved_at: nil,
-                number_occurrences: 1,
-                source_location_url: file_source_location_uri.to_s
-              )
-            )
-          )
+          it "raises an ActiveModel::ValidationError" do
+            expect { subject.track }.to raise_error(ActiveModel::ValidationError)
+          end
         end
 
         it "report tracked_tests" do
