@@ -110,7 +110,7 @@ You can automatically resolve previously tracked failing tests on the configured
 
 The `resolve` method calls the block with each tracked test and resolves those for which the block returns a truthy value.
 
-The resolved test are deleted from the configured [storage](#storage).
+The resolved test are not deleted from the configured [storage](#storage), they will have the attribute `resolved_at` set to the current time and will respond `true` to `resolved?`.
 
 ```ruby
 FlakyTestTracker.resolver.resolve do |test|
