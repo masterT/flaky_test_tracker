@@ -12,6 +12,7 @@ FactoryBot.define do
     id { 1 }
     html_url { "https://github.com/foo/bar/issue/1" }
     body { "There is an issue." }
+    state { "open" }
 
     initialize_with do
       new(

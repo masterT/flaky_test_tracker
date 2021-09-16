@@ -10,6 +10,7 @@ FactoryBot.define do
     file_path { "spec/foo_spec.rb" }
     line_number { 123 }
     finished_at { Time.current }
+    resolved_at { nil }
     source_location_url { "https://github.com/foo/bar/blob/0612bcf5b16a1ec368ef4ebb92d6be2f7040260b/spec/foo_spec.rb" }
     number_occurrences { 1 }
   end

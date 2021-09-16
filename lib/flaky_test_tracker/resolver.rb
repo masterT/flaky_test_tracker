@@ -16,11 +16,12 @@ module FlakyTestTracker
       @verbose = verbose
     end
 
-    # Resolve tests by deleting them from the storage.
-    # @yield [test] Call block with each {Test} on the {#storage} and resolve those when block returns a truthy value.
+    # Resolve tests by updating test "resolved_at" attribute to the current time on the storage.
+    # @yield [test] Call block with each {Test} with attribute "resolved_at" equals to nil on the {#storage} and
+    #   resolve those when block returns a truthy value.
     # @return [Array<Test>] resolved tests.
     def resolve(&block)
-      resolved_tests = storage.all.select(&block).map { |test| resolve_test(test) }
+      resolved_tests = select_tests(&block).map { |test| resolve_test(test) }
       reporter.resolved_tests(tests: resolved_tests)
       puts "\n[FlakyTestTracker][Resolver] #{resolved_tests.count} test(s) resolved" if verbose
       resolved_tests
@@ -28,10 +29,29 @@ module FlakyTestTracker
 
     private
 
+    def select_tests(&block)
+      storage.all.select do |test|
+        next if test.resolved?
+
+        block.call(test)
+      end
+    end
+
     def resolve_test(test)
       return test if pretend
 
-      storage.delete(test.id)
+      storage.update(
+        test.id,
+        build_resolved_test_input(test)
+      )
+    end
+
+    def build_resolved_test_input(test)
+      TestInput.new(
+        test.serializable_hash(except: %i[id url]).merge(
+          resolved_at: Time.now
+        )
+      )
     end
   end
 end

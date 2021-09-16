@@ -29,14 +29,19 @@ RSpec.describe FlakyTestTracker::Resolver do
 
     context "with Test" do
       let(:test) { build(:test) }
-      let(:test_resolved) { build(:test, test.serializable_hash) }
+      let(:test_resolved) do
+        build(
+          :test,
+          test.serializable_hash.merge(resolved_at: Time.now)
+        )
+      end
 
       before do
         allow(storage).to receive(:all).and_return([test])
       end
 
       it "fetch tests from storage" do
-        subject.resolve
+        subject.resolve { true }
 
         expect(storage).to have_received(:all)
       end
@@ -45,11 +50,19 @@ RSpec.describe FlakyTestTracker::Resolver do
         expect { |b| subject.resolve(&b) }.to yield_with_args(test)
       end
 
+      context "when Test already resolved" do
+        let(:test) { build(:test, resolved_at: Time.now) }
+
+        it "does not yield block with resolkved Test" do
+          expect { |b| subject.resolve(&b) }.not_to yield_with_args(test)
+        end
+      end
+
       context "when block result is true" do
         let(:result) { true }
 
         before do
-          allow(storage).to receive(:delete).and_return(test_resolved)
+          allow(storage).to receive(:update).and_return(test_resolved)
         end
 
         it "report resolved_tests" do
@@ -76,23 +89,30 @@ RSpec.describe FlakyTestTracker::Resolver do
           end
         end
 
-        it "deletes the Test" do
+        it "updates the Test with resolved_at" do
           subject.resolve { result }
 
-          expect(storage).to have_received(:delete).with(test.id)
+          expect(storage).to have_received(:update).with(
+            test.id,
+            FlakyTestTracker::TestInput.new(
+              test.serializable_hash(except: %i[id url]).merge(
+                resolved_at: Time.now
+              )
+            )
+          )
         end
 
-        it "returns deleted Test" do
+        it "returns updated Test" do
           expect(subject.resolve { result }).to containing_exactly(test_resolved)
         end
 
         context "when pretend" do
           let(:pretend) { true }
 
-          it "does not delete the Test" do
+          it "does not update the Test" do
             subject.resolve { result }
 
-            expect(storage).not_to have_received(:delete)
+            expect(storage).not_to have_received(:update)
           end
 
           it "returns Test" do

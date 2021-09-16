@@ -11,16 +11,21 @@ module FlakyTestTracker
   # @attr [#tracked_tests #resolved_tests] reporter
   # @attr [Boolean] verbose
   # @attr [Array<Hash>] test_inputs_attributes
+  # @attr [#build] test_input_factory
   class Tracker
-    attr_reader :pretend, :storage, :context, :source, :reporter, :verbose, :test_inputs_attributes
+    attr_reader :pretend, :storage, :context, :source, :reporter, :verbose, :test_inputs_attributes, :test_input_factory
 
-    def initialize(pretend:, storage:, context:, source:, reporter:, verbose:)
+    def initialize(
+      pretend:, storage:, context:, source:, reporter:, verbose:,
+      test_input_factory: FlakyTestTracker::TestInputFactory.new
+    )
       @pretend = pretend
       @storage = storage
       @context = context
       @source = source
       @reporter = reporter
       @verbose = verbose
+      @test_input_factory = test_input_factory
       @tests = nil
       @test_inputs_attributes = []
     end
@@ -104,37 +109,9 @@ module FlakyTestTracker
 
     def test_inputs
       test_inputs_attributes.map do |attributes|
-        test_input = build_test_input(**attributes)
-        test_input
+        test = find_test_by_reference(attributes[:reference])
+        test_input_factory.build(test: test, source: source, attributes: attributes)
       end
-    end
-
-    def build_test_input(reference:, file_path:, line_number:, **attributes)
-      FlakyTestTracker::TestInput.new(
-        attributes.merge(
-          reference: reference,
-          file_path: file_path,
-          line_number: line_number,
-          number_occurrences: build_test_input_number_occurrences(reference: reference),
-          source_location_url: build_test_input_source_location_url(file_path: file_path, line_number: line_number)
-        )
-      )
-    end
-
-    def build_test_input_number_occurrences(reference:)
-      test = find_test_by_reference(reference)
-      if test
-        test.number_occurrences + 1
-      else
-        1
-      end
-    end
-
-    def build_test_input_source_location_url(file_path:, line_number:)
-      source.file_source_location_uri(
-        file_path: file_path,
-        line_number: line_number
-      ).to_s
     end
 
     def find_test_by_reference(reference)

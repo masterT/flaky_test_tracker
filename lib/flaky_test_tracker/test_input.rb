@@ -10,6 +10,7 @@ module FlakyTestTracker
   # @attr [String] file_path Test source code file path.
   # @attr [Integer] line_number Test source code line number.
   # @attr [Time] finished_at The moment the test execution finished.
+  # @attr [Time] resolved_at The moment the test was resolved.
   # @attr [String] source_location_url Test source code location URL.
   # @attr [Integer] number_occurrences The number of times a failure was tracked.
   # @see FlakyTestTracker::Tracker#add
@@ -25,6 +26,7 @@ module FlakyTestTracker
       file_path
       line_number
       finished_at
+      resolved_at
       source_location_url
       number_occurrences
     ].freeze
