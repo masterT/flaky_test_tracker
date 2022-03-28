@@ -8,8 +8,8 @@ gemspec
 gem "byebug", platform: :mri
 gem "factory_bot", "~> 6.2"
 gem "rake", "~> 13.0"
+gem "redcarpet", "~> 3.3.4"
 gem "rspec", "~> 3.0"
 gem "rubocop", "~> 1.7"
 gem "shoulda-matchers", "~> 4.5"
 gem "yard", "~> 0.9.26"
-gem "redcarpet", "~> 3.3.4"
